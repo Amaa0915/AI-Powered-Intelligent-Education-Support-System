@@ -54,8 +54,6 @@ Thumbs.db
 .env.production.local
 stress_ml/.env
 
-# ML model files (large binaries)
-*.pkl
-*.joblib
-*.h5
-*.model
+# Large data files (>100MB - exceeds GitHub limit)
+# Download separately and place in backend/data/
+backend/data/academic_performance_1000_students_with_iq_study_hours.csv
