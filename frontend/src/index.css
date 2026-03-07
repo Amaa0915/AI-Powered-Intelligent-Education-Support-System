@@ -200,3 +200,152 @@ body {
   border: 2px solid white;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
+
+/* ═══════════════════════════════════════════════════════════
+   Attendance Analyzer — scoped dark theme
+   All classes below are namespaced under .attendance-section
+   to avoid collisions with the rest of the EduGuide light theme.
+════════════════════════════════════════════════════════════ */
+
+/* Card */
+.attendance-section .card {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+/* Stat Card (card with hover glow) */
+.attendance-section .stat-card {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+.attendance-section .stat-card:hover {
+  border-color: rgba(96, 165, 250, 0.4);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
+}
+
+/* Badges */
+.attendance-section .badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.attendance-section .badge-critical {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.attendance-section .badge-high {
+  background: rgba(249, 115, 22, 0.2);
+  color: #fb923c;
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+.attendance-section .badge-medium {
+  background: rgba(234, 179, 8, 0.2);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+.attendance-section .badge-low {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* Primary button */
+.attendance-section .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-family: inherit;
+}
+.attendance-section .btn-primary:hover {
+  background: #3b82f6;
+}
+
+/* Table row */
+.attendance-section .table-row {
+  border-bottom: 1px solid rgba(71, 85, 105, 0.5);
+  transition: background 0.15s ease;
+}
+.attendance-section .table-row:hover {
+  background: rgba(71, 85, 105, 0.3);
+}
+
+/* Input field */
+.attendance-section .input-field {
+  background: rgba(71, 85, 105, 0.5);
+  border: 1px solid rgba(100, 116, 139, 0.5);
+  color: #ffffff;
+  border-radius: 0.75rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.attendance-section .input-field::placeholder {
+  color: #94a3b8;
+}
+.attendance-section .input-field:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+/* Gradient text */
+.attendance-section .gradient-text {
+  background: linear-gradient(135deg, #60a5fa, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glow effect */
+.attendance-section .glow-blue {
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.15);
+}
+
+/* Shimmer loading animation */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.attendance-section .shimmer {
+  animation: shimmer 2s infinite;
+  background: linear-gradient(
+    90deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+}
+
+/* Fade-in page animation */
+@keyframes attendanceFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.attendance-section .animate-fade-in {
+  animation: attendanceFadeIn 0.4s ease-out forwards;
+}

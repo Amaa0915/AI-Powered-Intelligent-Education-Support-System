@@ -5,23 +5,23 @@ import {
   BookOpen,
   Target,
   Activity,
+  CalendarCheck,
   Settings,
-  LogOut,
-  CalendarCheck
+  LogOut
 } from 'lucide-react';
 
 const Sidebar = () => {
   const navItems = [
-    { name: 'Learning Path', icon: <Home size={20} />, path: '/' },
-    { name: 'Risk Predictor', icon: <Target size={20} />, path: '/risk-predictor' },
-    { name: 'Stress Prediction', icon: <Activity size={20} />, path: '/stress' },
-    { name: 'Attendance Trends', icon: <CalendarCheck size={20} />, path: '/attendance-analyze' },
+    { name: 'Learning Path',      icon: <Home          size={20} />, path: '/' },
+    { name: 'Risk Predictor',     icon: <Target        size={20} />, path: '/risk-predictor' },
+    { name: 'Stress Prediction',  icon: <Activity      size={20} />, path: '/stress' },
+    { name: 'Attendance Trends',  icon: <CalendarCheck size={20} />, path: '/attendance' },
   ];
 
   return (
     <div className="fixed inset-y-0 left-0 w-64 bg-[#0f172a] text-white flex flex-col z-20">
-      <div className="p-6 flex items-center gap-3">
-        <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
+      <div className="flex items-center gap-3 p-6">
+        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500">
           <BookOpen size={20} className="text-white" />
         </div>
         <div>
@@ -43,24 +43,24 @@ const Sidebar = () => {
             `}
           >
             {item.icon}
-            <span className="font-medium text-sm">{item.name}</span>
+            <span className="text-sm font-medium">{item.name}</span>
           </NavLink>
         ))}
       </nav>
 
-      <div className="px-4 py-6 border-t border-slate-800 space-y-1">
+      <div className="px-4 py-6 space-y-1 border-t border-slate-800">
         <NavLink
           to="/settings"
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all"
+          className="flex items-center gap-3 px-4 py-3 transition-all rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white"
         >
           <Settings size={20} />
-          <span className="font-medium text-sm">Settings</span>
+          <span className="text-sm font-medium">Settings</span>
         </NavLink>
         <button
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all"
+          className="flex items-center w-full gap-3 px-4 py-3 transition-all rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white"
         >
           <LogOut size={20} />
-          <span className="font-medium text-sm">Sign Out</span>
+          <span className="text-sm font-medium">Sign Out</span>
         </button>
       </div>
     </div>
