@@ -39,7 +39,7 @@ MONTH_LABELS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov
 DOW_ORDER    = ['Monday','Tuesday','Wednesday','Thursday','Friday']
 DIST_ORDER   = ['Nearby','Moderate','Far','Very Far']
 
-WEATHER_ADJ = {'sunny':0.0,'cloudy':-0.5,'rainy':-4.0,'windy':-1.5,'stormy':-6.0,'foggy':-2.0}
+WEATHER_ADJ = {'sunny':1.5,'cloudy':0.0,'rainy':-4.0,'windy':-1.5,'stormy':-6.0,'foggy':-2.0}
 
 SL_EVENTS = {
     'exam':          (+3.5, 'Exam period — high attendance expected',        'green'),
@@ -509,8 +509,8 @@ def guest_trend():
 
     # Human-readable descriptions
     _w_desc = {
-        'sunny':  'Clear sunny weather — minimal impact on attendance',
-        'cloudy': 'Cloudy skies — slight reduction in attendance',
+        'sunny':  'Sunny weather — favorable conditions, attendance above average',
+        'cloudy': 'Overcast skies — neutral, no significant attendance impact',
         'rainy':  'Rain typically reduces attendance significantly',
         'windy':  'Windy conditions — minor attendance drop',
         'stormy': 'Storms cause major attendance drops',
@@ -621,14 +621,12 @@ def guest_trend():
         else:
             headline = 'Standard week — no major contextual disruptions'
 
-        # factors: array of {icon, name, delta} — what the frontend renders as bars
-        factors_objs = []
-        if abs(w_adj) > 0.01:
-            factors_objs.append({'icon':'☁️', 'name':f'Weather ({weather})',   'delta': round(w_adj, 1)})
-        if abs(temp_adj_val) > 0.01:
-            factors_objs.append({'icon':'🌡️', 'name':f'Temperature ({temperature}°C)', 'delta': round(temp_adj_val, 1)})
-        if abs(d_adj) > 0.01:
-            factors_objs.append({'icon':'📍', 'name':f'Distance ({db_str})',   'delta': round(d_adj, 1)})
+        # factors: always include weather, temperature, distance — plus events/holidays if present
+        factors_objs = [
+            {'icon': '☀️', 'name': f'Weather ({weather.capitalize()})', 'delta': round(w_adj, 1)},
+            {'icon': '🌡️', 'name': f'Temperature ({temperature}°C)',    'delta': round(temp_adj_val, 1)},
+            {'icon': '📍', 'name': f'Distance ({db_str})',              'delta': round(d_adj, 1)},
+        ]
         if events_seen:
             ev_adj_avg = round(sum(SL_EVENTS.get(e,(0,))[0] for e in events_seen) / len(events_seen), 1)
             factors_objs.append({'icon':'📅', 'name':f'Events ({", ".join(set(events_seen))})', 'delta': ev_adj_avg})
