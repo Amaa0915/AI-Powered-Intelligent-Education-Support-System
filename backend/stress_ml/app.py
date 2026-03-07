@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import joblib
 import numpy as np
+import pandas as pd
 from google import genai
 from google.genai import types
 import os
@@ -131,19 +132,19 @@ Safety Disclaimer: [One sentence disclaimer]
 def predict():
     data = request.json
 
-    features = np.array([[
-        data["term_mark_avg"],
-        data["prev_term_mark_avg"],
-        data["daily_study"],
-        data["prefer_study"],
-        data["travel_time"],
-        data["financial_status"],
-        data["social_media"],
-        data["sleep_hours"],
-        data["attendance"],
-        data["tuition_hours_per_week"],
-        data["disaster_impact"]
-    ]])
+    features = pd.DataFrame([{
+        "term_mark_avg":          float(data["term_mark_avg"]),
+        "prev_term_mark_avg":     float(data["prev_term_mark_avg"]),
+        "daily_study":            float(data["daily_study"]),
+        "prefer_study":           int(data["prefer_study"]),
+        "travel_time":            float(data["travel_time"]),
+        "financial_status":       int(data["financial_status"]),
+        "social_media":           float(data["social_media"]),
+        "sleep_hours":            float(data["sleep_hours"]),
+        "attendance":             float(data["attendance"]),
+        "tuition_hours_per_week": float(data["tuition_hours_per_week"]),
+        "disaster_impact":        int(data["disaster_impact"]),
+    }])
 
     pred = model.predict(features)[0]
     labels = {0: "Good", 1: "Bad", 2: "Awful"}

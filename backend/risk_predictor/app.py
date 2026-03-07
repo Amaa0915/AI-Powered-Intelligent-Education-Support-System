@@ -14,7 +14,8 @@ CORS(app)
 MONGO_URI = "mongodb://admin:1234@ac-d11ealg-shard-00-00.spi8fnl.mongodb.net:27017,ac-d11ealg-shard-00-01.spi8fnl.mongodb.net:27017,ac-d11ealg-shard-00-02.spi8fnl.mongodb.net:27017/?ssl=true&replicaSet=atlas-g0x1t5-shard-0&authSource=admin&retryWrites=true&w=majority"
 client = MongoClient(MONGO_URI)
 db = client['student_risk_db']
-students_col = db['students']
+students_col    = db['students']
+predictions_col = db['risk_predictions']
 
 # Load models and data
 print("Loading trained models and data...")
@@ -223,6 +224,30 @@ def get_student_risk(student_id):
             'action_plan': recommendations
         }
 
+        # ── Save prediction result to MongoDB ──────────────────────────
+        try:
+            predictions_col.insert_one({
+                'student_id':    student_id,
+                'risk_level':    prediction['risk_category'],
+                'risk_code':     prediction['risk_code'],
+                'probabilities': {
+                    'low':    prediction['low_risk_prob'],
+                    'medium': prediction['medium_risk_prob'],
+                    'high':   prediction['high_risk_prob'],
+                },
+                'confidence':       prediction['confidence'],
+                'metrics': {
+                    'avg_score':             float(student_data['avg_score']),
+                    'attendance_rate':       float(student_data['attendance_rate']),
+                    'study_hours_per_week':  float(student_data['study_hours_per_week']),
+                },
+                'action_plan':   recommendations,
+                'predicted_at':  datetime.now(),
+            })
+        except Exception as save_err:
+            print(f'⚠️  Could not save prediction to DB: {save_err}')
+        # ────────────────────────────────────────────────────────────────
+
         return jsonify(response_data)
 
     except Exception as e:
@@ -317,6 +342,24 @@ def save_student():
     except Exception as e:
         import traceback
         traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/risk/history/<student_id>', methods=['GET'])
+def get_risk_history(student_id):
+    try:
+        limit = int(request.args.get('limit', 20))
+        records = list(
+            predictions_col.find({'student_id': student_id})
+                           .sort('predicted_at', -1)
+                           .limit(limit)
+        )
+        for r in records:
+            r['_id'] = str(r['_id'])
+            if 'predicted_at' in r and hasattr(r['predicted_at'], 'isoformat'):
+                r['predicted_at'] = r['predicted_at'].isoformat()
+        return jsonify(records)
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 

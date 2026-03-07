@@ -6,18 +6,27 @@ import RiskGauge from './components/RiskGauge';
 import MetricCard from './components/MetricCard';
 import SubjectAnalysis from './components/SubjectAnalysis';
 import ActionPlan from './components/ActionPlan';
+import HistoryModal, { fmtDate } from '../../components/HistoryModal';
+import { getUser } from '../../services/authService';
+
+const RISK_COLOR = { 'Low Risk': '#10b981', 'Medium Risk': '#f59e0b', 'High Risk': '#ef4444' };
 
 const RiskDashboard = () => {
   const [searchParams] = useSearchParams();
-  const initialId = searchParams.get('studentId') || 'STU0001';
-  const [studentId, setStudentId] = useState(initialId);
+  const _user     = getUser();
+  const studentId = _user?._id || _user?.id || searchParams.get('studentId') || 'GUEST';
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyRecs, setHistoryRecs] = useState([]);
+  const [historyLoad, setHistoryLoad] = useState(false);
+  const [historyErr,  setHistoryErr]  = useState('');
+
   useEffect(() => {
-    fetchData(initialId);
-  }, [initialId]);
+    fetchData(studentId);
+  }, [studentId]);
 
   const fetchData = async (id) => {
     setLoading(true);
@@ -34,23 +43,78 @@ const RiskDashboard = () => {
     }
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    fetchData(studentId);
+  const openHistory = async () => {
+    setHistoryOpen(true);
+    setHistoryLoad(true);
+    setHistoryErr('');
+    try {
+      const res = await axios.get(`${API_URLS.RISK_PREDICTOR_BACKEND}/api/risk/history/${studentId}`);
+      setHistoryRecs(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      setHistoryErr(err.response?.data?.error || 'Failed to load history.');
+    } finally {
+      setHistoryLoad(false);
+    }
   };
 
   if (loading) return <div className="flex items-center justify-center h-64 text-emerald-600 font-bold">Loading...</div>;
 
   return (
     <div className="space-y-6">
+      {/* History Modal */}
+      <HistoryModal
+        isOpen={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        title="Your Risk Prediction History"
+        loading={historyLoad}
+        error={historyErr}
+        records={historyRecs}
+        emptyText="No risk predictions saved for this student yet. Run a prediction first."
+        columns={['#', 'Date', 'Risk Level', 'Confidence', 'Avg Score', 'Attendance', 'Study Hrs']}
+        renderRow={(rec, i) => {
+          const lvl   = rec.risk_level || '—';
+          const color = RISK_COLOR[lvl] || '#94a3b8';
+          return (
+            <>
+              <td className="px-4 py-3 text-slate-500 text-xs">{i + 1}</td>
+              <td className="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">{fmtDate(rec.predicted_at)}</td>
+              <td className="px-4 py-3">
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full"
+                  style={{ background: `${color}18`, color, border: `1px solid ${color}30` }}>
+                  {lvl}
+                </span>
+              </td>
+              <td className="px-4 py-3 text-slate-300 text-xs">{rec.confidence != null ? `${(rec.confidence * 100).toFixed(1)}%` : '—'}</td>
+              <td className="px-4 py-3 text-slate-300 text-xs">{rec.metrics?.avg_score?.toFixed(1) ?? '—'}%</td>
+              <td className="px-4 py-3 text-slate-300 text-xs">{rec.metrics?.attendance_rate?.toFixed(1) ?? '—'}%</td>
+              <td className="px-4 py-3 text-slate-300 text-xs">{rec.metrics?.study_hours_per_week?.toFixed(1) ?? '—'} h</td>
+            </>
+          );
+        }}
+      />
+
       {error ? (
         <div className="bg-red-50 text-red-600 p-8 rounded-2xl border border-red-200 text-center">
           <p className="font-bold text-lg mb-2">Student Not Found</p>
           <p className="opacity-75 mb-6">{error}</p>
-          <Link to="/risk-predictor" className="bg-emerald-500 text-white px-6 py-2 rounded-lg font-bold">Add This Student</Link>
+          <div className="flex items-center justify-center gap-3">
+            <Link to="/risk-predictor" className="bg-emerald-500 text-white px-6 py-2 rounded-lg font-bold">Add This Student</Link>
+            <button onClick={openHistory}
+              className="bg-white border border-slate-200 text-slate-600 px-6 py-2 rounded-lg font-bold hover:bg-slate-50 transition-colors flex items-center gap-2">
+              📋 View History
+            </button>
+          </div>
         </div>
       ) : (
         <div className="space-y-6">
+          {/* History button row */}
+          <div className="flex justify-end">
+            <button onClick={openHistory}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-sm font-semibold hover:bg-slate-50 shadow-sm transition-colors">
+              📋 Prediction History
+            </button>
+          </div>
+
           <RiskGauge
             riskLevel={data?.risk_assessment?.risk_level}
             probability={data?.risk_assessment?.probabilities?.low}

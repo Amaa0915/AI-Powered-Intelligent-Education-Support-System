@@ -5,6 +5,12 @@ Combines: Learning Path API + Stress Prediction + Risk Predictor
 
 import os
 import sys
+
+# Fix Windows console encoding
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8')
 import random
 import string
 import joblib
@@ -72,14 +78,16 @@ except Exception as e:
 
 # Risk predictor DB
 try:
-    risk_mongo       = MongoClient("mongodb://admin:1234@ac-d11ealg-shard-00-00.spi8fnl.mongodb.net:27017,ac-d11ealg-shard-00-01.spi8fnl.mongodb.net:27017,ac-d11ealg-shard-00-02.spi8fnl.mongodb.net:27017/?ssl=true&replicaSet=atlas-g0x1t5-shard-0&authSource=admin&retryWrites=true&w=majority", serverSelectionTimeoutMS=5000)
-    risk_db          = risk_mongo['student_risk_db']
-    students_risk_col = risk_db['students']
+    risk_mongo            = MongoClient("mongodb+srv://admin:1234@paf.spi8fnl.mongodb.net/student_risk_db", serverSelectionTimeoutMS=5000)
+    risk_db               = risk_mongo['student_risk_db']
+    students_risk_col     = risk_db['students']
+    risk_predictions_col  = risk_db['risk_predictions']
     risk_mongo.admin.command('ping')
     print("✅ Risk MongoDB connected")
 except Exception as e:
     print(f"⚠️ Risk MongoDB failed: {e}")
-    students_risk_col = None
+    students_risk_col    = None
+    risk_predictions_col = None
 
 # ── FastAPI App ────────────────────────────────────────────────
 app = FastAPI(title="EduGuide Unified API", version="1.0.0")
@@ -157,8 +165,12 @@ async def add_student(student: NewStudentInput):
         mongodb_id = None
         if mongodb_handler.connected and mongodb_handler.students_collection is not None:
             try:
-                res = mongodb_handler.students_collection.insert_one(student_doc)
-                mongodb_id = str(res.inserted_id)
+                res = mongodb_handler.students_collection.update_one(
+                    {'student_id': generated_id},
+                    {'$set': {**student_doc, 'updated_at': datetime.now().isoformat()}},
+                    upsert=True
+                )
+                mongodb_id = str(res.upserted_id) if res.upserted_id else generated_id
             except Exception:
                 pass
 
@@ -170,7 +182,7 @@ async def add_student(student: NewStudentInput):
         })
         return {
             "success": True,
-            "message": "Student added!" + (" (MongoDB)" if mongodb_id else " (Offline)"),
+            "message": "Student saved!" + (" (MongoDB)" if mongodb_id else " (Offline)"),
             "student_id": generated_id, "mongodb_id": mongodb_id,
             "cluster": analysis_result.get('cluster'), "avg_score": analysis_result.get('avg_score'),
             "weak_subjects": weak_analysis['weak_subjects'],
@@ -199,7 +211,7 @@ async def add_student_extended(student: NewStudentInputExtended):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/students/mongodb/{student_id}", response_model=StudentFullProfile)
+@app.get("/students/mongodb/{student_id}")
 async def get_student_mongodb(student_id: str):
     student = mongodb_handler.get_student_by_id(student_id)
     if not student:
@@ -662,6 +674,24 @@ def _risk_recommendations(student_data):
                 "Consider joining advanced academic workshops"]
     return recs
 
+@app.get("/api/risk/history/{student_id}")
+async def get_risk_history(student_id: str, limit: int = 20):
+    if risk_predictions_col is None:
+        return []
+    try:
+        docs = list(
+            risk_predictions_col.find({'student_id': student_id})
+                                .sort('predicted_at', -1)
+                                .limit(limit)
+        )
+        for d in docs:
+            d['_id'] = str(d['_id'])
+            if 'predicted_at' in d and hasattr(d['predicted_at'], 'isoformat'):
+                d['predicted_at'] = d['predicted_at'].isoformat()
+        return docs
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/risk/{student_id}")
 async def get_student_risk(student_id: str):
     try:
@@ -674,8 +704,31 @@ async def get_student_risk(student_id: str):
         if student_data is None:
             raise HTTPException(status_code=404, detail="Student not found")
 
-        prediction   = _predict_risk(student_data)
+        prediction      = _predict_risk(student_data)
         recommendations = _risk_recommendations(student_data)
+
+        # Save prediction to MongoDB
+        if risk_predictions_col is not None:
+            try:
+                risk_predictions_col.insert_one({
+                    'student_id':    student_id,
+                    'risk_level':    prediction['risk_category'],
+                    'probabilities': {
+                        'low':    prediction['low_risk_prob'],
+                        'medium': prediction['medium_risk_prob'],
+                        'high':   prediction['high_risk_prob'],
+                    },
+                    'confidence':   max(prediction['low_risk_prob'], prediction['medium_risk_prob'], prediction['high_risk_prob']),
+                    'metrics': {
+                        'avg_score':           float(student_data['avg_score']),
+                        'attendance_rate':      float(student_data['attendance_rate']),
+                        'study_hours_per_week': float(student_data['study_hours_per_week']),
+                    },
+                    'action_plan':  recommendations,
+                    'predicted_at': datetime.now(),
+                })
+            except Exception as save_err:
+                print(f"[WARN] Could not save risk prediction: {save_err}")
 
         return {
             'student_info': {
@@ -794,4 +847,4 @@ async def delete_risk_student(student_id: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=False)

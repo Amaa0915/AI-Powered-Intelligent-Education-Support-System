@@ -10,12 +10,14 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/api/students', require('./routes/students'));
-app.use('/api/attendance', require('./routes/attendance'));
+app.use('/api/auth',      require('./routes/auth'));
+app.use('/api/admin',     require('./routes/admin'));
+app.use('/api/students',  require('./routes/students'));
+app.use('/api/attendance',require('./routes/attendance'));
 app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/anomalies', require('./routes/anomalies'));
-app.use('/api/forecast', require('./routes/forecast'));
-app.use('/api/contextual', require('./routes/contextual'));
+app.use('/api/forecast',  require('./routes/forecast'));
+app.use('/api/contextual',require('./routes/contextual'));
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)

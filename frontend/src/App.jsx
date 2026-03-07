@@ -1,5 +1,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useSearchParams } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+// Auth pages
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
+import UnauthorizedPage from './pages/UnauthorizedPage';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Learning Path features
 import LPAddStudent from './features/learning-path/AddStudent';
@@ -40,33 +49,47 @@ function RiskPredictorPage() {
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* Learning Path routes */}
-        <Route path="/" element={<LPAddStudent />} />
-        <Route path="/add-student" element={<LPAddStudent />} />
-        <Route path="/dashboard" element={<LPDashboard />} />
-        <Route path="/students" element={<StudentList />} />
-        <Route path="/students/:id" element={<StudentProfile />} />
-        <Route path="/adaptive-path" element={<AdaptivePath />} />
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || ''}>
+      <Router>
+        <Routes>
+          {/* ── Public routes ───────────────────────────────────────── */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-        {/* Stress Prediction */}
-        <Route path="/stress" element={<StressPrediction />} />
+          {/* ── Admin route ─────────────────────────────────────────── */}
+          <Route path="/admin/dashboard" element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
 
-        {/* Risk Predictor */}
-        <Route path="/risk-predictor" element={<RiskPredictorPage />} />
+          {/* ── Protected: Learning Path ─────────────────────────────── */}
+          <Route path="/add-student" element={<ProtectedRoute><LPAddStudent /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute><LPDashboard /></ProtectedRoute>} />
+          <Route path="/students" element={<ProtectedRoute><StudentList /></ProtectedRoute>} />
+          <Route path="/students/:id" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />
+          <Route path="/adaptive-path" element={<ProtectedRoute><AdaptivePath /></ProtectedRoute>} />
 
-        {/* Attendance Trends */}
-        <Route path="/attendance" element={<AttendanceLayout />}>
-          <Route index element={<AttendanceDashboard />} />
-          <Route path="trends" element={<AttendanceTrendsPage />} />
-          <Route path="anomalies" element={<AnomalyReport />} />
-          <Route path="contextual" element={<ContextualAnalysis />} />
-          <Route path="forecast" element={<AttendanceForecasting />} />
-          <Route path="students" element={<StudentDirectory />} />
-        </Route>
-      </Routes>
-    </Router>
+          {/* ── Protected: Stress Prediction ─────────────────────────── */}
+          <Route path="/stress" element={<ProtectedRoute><StressPrediction /></ProtectedRoute>} />
+
+          {/* ── Protected: Risk Predictor ────────────────────────────── */}
+          <Route path="/risk-predictor" element={<ProtectedRoute><RiskPredictorPage /></ProtectedRoute>} />
+
+          {/* ── Protected: Attendance Trends ─────────────────────────── */}
+          <Route path="/attendance" element={<ProtectedRoute><AttendanceLayout /></ProtectedRoute>}>
+            <Route index element={<AttendanceDashboard />} />
+            <Route path="trends" element={<AttendanceTrendsPage />} />
+            <Route path="anomalies" element={<AnomalyReport />} />
+            <Route path="contextual" element={<ContextualAnalysis />} />
+            <Route path="forecast" element={<AttendanceForecasting />} />
+            <Route path="students" element={<StudentDirectory />} />
+          </Route>
+        </Routes>
+      </Router>
+    </GoogleOAuthProvider>
   );
 }
 

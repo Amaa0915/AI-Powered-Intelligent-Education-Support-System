@@ -17,10 +17,10 @@ class MongoDBHandler:
             self.db = self.client['student_monitoring_db']
             self.students_collection = self.db['students']
             self.connected = True
-            print("✅ SUCCESS: Connected to MongoDB Atlas!")
+            print("[OK] SUCCESS: Connected to MongoDB Atlas!")
         except Exception as e:
-            print(f"⚠️ WARNING: MongoDB connection failed: {e}")
-            print("📌 Running in OFFLINE mode")
+            print(f"[WARN] WARNING: MongoDB connection failed: {e}")
+            print("[INFO] Running in OFFLINE mode")
             self.connected = False
 
     def generate_weekly_schedule(self, stream: str) -> List[Dict[str, Any]]:
@@ -219,7 +219,7 @@ class MongoDBHandler:
                 result = self.students_collection.insert_one(student_doc)
                 mongodb_id = str(result.inserted_id)
             except Exception as e:
-                print(f"⚠️ Failed to save to MongoDB: {e}")
+                print(f"[WARN] Failed to save to MongoDB: {e}")
 
         return {
             "success": True,
@@ -240,7 +240,7 @@ class MongoDBHandler:
                 student['_id'] = str(student['_id'])
                 return student
         except Exception as e:
-            print(f"⚠️ Failed to get student: {e}")
+            print(f"[WARN] Failed to get student: {e}")
         return None
 
     def get_all_students(self) -> List[Dict[str, Any]]:
@@ -252,7 +252,7 @@ class MongoDBHandler:
                 student['_id'] = str(student['_id'])
             return students
         except Exception as e:
-            print(f"⚠️ Failed to get students: {e}")
+            print(f"[WARN] Failed to get students: {e}")
             return []
 
     def close(self):
