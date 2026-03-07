@@ -1,0 +1,3 @@
+backend/stress_api/node_modules
+frontend/node_modules/@babel/core/lib/config/partial.js.map
+backend/data/academic_performance_1000_students_with_iq_study_hours.csv
