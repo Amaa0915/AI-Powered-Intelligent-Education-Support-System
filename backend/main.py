@@ -8,9 +8,9 @@ import sys
 
 # Fix Windows console encoding
 if hasattr(sys.stdout, 'reconfigure'):
-    sys.stdout.reconfigure(encoding='utf-8')
+    getattr(sys.stdout, 'reconfigure')(encoding='utf-8')
 if hasattr(sys.stderr, 'reconfigure'):
-    sys.stderr.reconfigure(encoding='utf-8')
+    getattr(sys.stderr, 'reconfigure')(encoding='utf-8')
 import random
 import string
 import joblib
@@ -45,7 +45,7 @@ gemini_client = None
 GEMINI_MODEL = "gemini-2.5-flash"
 if GEMINI_API_KEY:
     try:
-        from google import genai
+        from google import genai  # type: ignore
         gemini_client = genai.Client(api_key=GEMINI_API_KEY)
         print("✅ Gemini AI connected")
     except Exception as e:
@@ -614,19 +614,46 @@ def _engineer_risk_features(historical_records):
     else:
         last['attendance_trend'] = last['performance_trend'] = last['study_hours_trend'] = 0
 
-    last['homework_discipline'] = last.get('homework_completion_rate', 0) * 0.5 + last.get('homework_on_time_rate', 0) * 0.5
-    last['overall_engagement']  = (last.get('homework_completion_rate', 0) * 0.25 +
-                                   last.get('classwork_completion_rate', 0) * 0.25 +
-                                   last.get('lms_engagement_score', 0) * 0.25 +
-                                   last.get('parent_engagement_score', 0) * 0.25)
-    last['academic_consistency'] = 1 / (last.get('score_std', 0) + 1)
-    last['critical_attendance']  = 1 if last['attendance_rate'] < 75 else 0
-    last['failing_performance']  = 1 if last['avg_score'] < 40 else 0
-    last['multiple_weak_subjects'] = 1 if last.get('weak_subjects', 0) >= 3 else 0
-    last['low_parental_support']   = 1 if last.get('parent_engagement_score', 0) < 0.5 else 0
-    last['attendance_performance_product'] = last['attendance_rate'] * last['avg_score'] / 100
-    last['iq_study_interaction']   = last['iq_level'] * last['study_hours_per_week'] / 100
-    last['risk_momentum']          = (-last['attendance_trend'] * 0.5) + (-last['performance_trend'] * 0.5)
+    # Compute min/max/std from subject columns if not already present
+    subject_cols = ['Mathematics_score', 'Science_score', 'English_score',
+                    'History_score', 'Sinhala_score', 'Buddhism_score',
+                    'Geography_score', 'ICT_score']
+    subj_scores = [float(last.get(c, 0)) for c in subject_cols if c in last.index and pd.notna(last.get(c, 0)) and float(last.get(c, 0)) > 0]
+    if subj_scores:
+        if pd.isna(last.get('min_score', np.nan)):
+            last['min_score'] = min(subj_scores)
+        if pd.isna(last.get('max_score', np.nan)):
+            last['max_score'] = max(subj_scores)
+        if pd.isna(last.get('score_std', np.nan)):
+            last['score_std'] = float(np.std(subj_scores))
+        if pd.isna(last.get('weak_subjects', np.nan)):
+            last['weak_subjects'] = sum(1 for s in subj_scores if s < 50)
+        if pd.isna(last.get('failing_subjects', np.nan)):
+            last['failing_subjects'] = sum(1 for s in subj_scores if s < 35)
+    else:
+        for col, val in [('min_score', last.get('avg_score', 50)),
+                         ('max_score', last.get('avg_score', 50)),
+                         ('score_std', 0), ('weak_subjects', 0), ('failing_subjects', 0)]:
+            if pd.isna(last.get(col, np.nan)):
+                last[col] = val
+
+    # days_present estimated from attendance_rate (200-day school year)
+    if pd.isna(last.get('days_present', np.nan)):
+        last['days_present'] = float(last['attendance_rate']) * 200 / 100.0
+
+    last['homework_discipline'] = float(last.get('homework_completion_rate', 0.7)) * 0.5 + float(last.get('homework_on_time_rate', 0.7)) * 0.5
+    last['overall_engagement']  = (float(last.get('homework_completion_rate', 0.7)) * 0.25 +
+                                   float(last.get('classwork_completion_rate', 0.8)) * 0.25 +
+                                   float(last.get('lms_engagement_score', 0.7)) * 0.25 +
+                                   float(last.get('parent_engagement_score', 0.7)) * 0.25)
+    last['academic_consistency'] = 1.0 / (float(last.get('score_std', 0)) + 1.0)
+    last['critical_attendance']  = 1 if float(last['attendance_rate']) < 75 else 0
+    last['failing_performance']  = 1 if float(last['avg_score']) < 40 else 0
+    last['multiple_weak_subjects'] = 1 if float(last.get('weak_subjects', 0)) >= 3 else 0
+    last['low_parental_support']   = 1 if float(last.get('parent_engagement_score', 0.7)) < 0.5 else 0
+    last['attendance_performance_product'] = float(last['attendance_rate']) * float(last['avg_score']) / 100.0
+    last['iq_study_interaction']   = float(last['iq_level']) * float(last['study_hours_per_week']) / 100.0
+    last['risk_momentum']          = (-float(last['attendance_trend']) * 0.5) + (-float(last['performance_trend']) * 0.5)
     return last
 
 def _get_risk_student_data(student_id):
@@ -650,11 +677,14 @@ def _predict_risk(student_data):
     arr  = np.array([features])
     pred = risk_model.predict(arr)[0]
     prob = risk_model.predict_proba(arr)[0]
+    # Map probabilities to class names using actual label encoding order
+    classes = list(risk_label_encoder.classes_)
+    prob_dict = {cls: float(prob[i]) for i, cls in enumerate(classes)}
     return {
-        'risk_category': risk_label_encoder.inverse_transform([pred])[0],
-        'low_risk_prob':    float(prob[0]),
-        'medium_risk_prob': float(prob[1]),
-        'high_risk_prob':   float(prob[2]),
+        'risk_category':    risk_label_encoder.inverse_transform([pred])[0],
+        'low_risk_prob':    prob_dict.get('Low Risk',    0.0),
+        'medium_risk_prob': prob_dict.get('Medium Risk', 0.0),
+        'high_risk_prob':   prob_dict.get('High Risk',   0.0),
     }
 
 def _risk_recommendations(student_data):
@@ -779,6 +809,10 @@ class RiskStudentRecord(BaseModel):
     performance_trend:   Optional[str] = "Stable"
     behavior_frequency:  Optional[int] = 0
     subject_marks:       Optional[Dict[str, float]] = {}
+    iq_level:                  Optional[float] = 100.0
+    homework_completion_rate:  Optional[float] = 0.8
+    homework_on_time_rate:     Optional[float] = 0.75
+    screen_time_hours:         Optional[float] = 2.0
 
 class RiskStudentInput(BaseModel):
     student_id: str
@@ -806,17 +840,20 @@ async def save_risk_student(body: RiskStudentInput):
                 'student_id': body.student_id, 'grade': rec.grade, 'year': rec.year,
                 'attendance_rate': rec.attendance_percentage, 'avg_score': float(avg),
                 'study_hours_per_week': rec.study_hours_per_week,
-                'performance_trend_value': trend_map.get(rec.performance_trend, 0),
+                'performance_trend_value': (trend_map.get(rec.performance_trend, 0) if rec.performance_trend else 0),
                 'disciplinary_actions': rec.behavior_frequency,
                 **{v: float(sm.get(k, 0)) for k, v in subject_map.items()},
                 'weak_subjects': weak, 'failing_subjects': sum(1 for s in scores if s < 35),
                 'score_std': std,
-                'homework_completion_rate': 0.8, 'classwork_completion_rate': 0.8,
+                'homework_completion_rate': rec.homework_completion_rate if rec.homework_completion_rate is not None else 0.8,
+                'classwork_completion_rate': 0.8,
                 'lms_engagement_score': 0.7, 'parent_engagement_score': 0.7,
-                'iq_level': 100, 'health_status': 'Good', 'homework_on_time_rate': 0.9,
+                'iq_level': rec.iq_level if rec.iq_level is not None else 100,
+                'health_status': 'Good',
+                'homework_on_time_rate': rec.homework_on_time_rate if rec.homework_on_time_rate is not None else 0.75,
                 'has_learning_difficulty': 0, 'extracurricular_participation': 1,
                 'travel_time_to_school': 20, 'sleep_hours_per_night': 8,
-                'social_media_usage_hours': 1, 'peer_influence_score': 0.5,
+                'social_media_usage_hours': rec.screen_time_hours if rec.screen_time_hours is not None else 1, 'peer_influence_score': 0.5,
                 'financial_status_score': 0.8, 'family_support_score': 0.9,
                 'teacher_support_score': 0.9, 'school_environment_score': 0.9,
                 'counseling_sessions_attended': 0, 'previous_year_fail': 0,

@@ -42,7 +42,7 @@ start "Attendance API" cmd /k "cd /d "%ROOT%backend\attendance_api" && npm insta
 
 :: Start ML Service (Python Flask on port 8001)
 echo Starting ML Service on port 8001...
-start "ML Service" cmd /k "cd /d "%ROOT%backend\ml_service" && "%ROOT%.venv\Scripts\python.exe" app.py"
+start "ML Service" cmd /k "cd /d "%ROOT%backend\ml_service" && pip install -r requirements.txt -q && python app.py"
 
 :: Start Frontend (installs deps then starts Vite)
 echo Starting frontend on port 5173...

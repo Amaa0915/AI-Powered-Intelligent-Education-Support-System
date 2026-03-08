@@ -1,0 +1,7 @@
+{
+  "pythonPath": "C:/Users/thili/AppData/Local/Programs/Python/Python311/python.exe",
+  "include": ["backend"],
+  "exclude": ["backend/__pycache__", "backend/**/__pycache__"],
+  "reportMissingImports": "none",
+  "reportMissingModuleSource": "none"
+}

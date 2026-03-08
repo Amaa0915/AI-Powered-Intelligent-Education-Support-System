@@ -1,0 +1,9 @@
+{
+  "python.defaultInterpreterPath": "C:/Users/thili/AppData/Local/Programs/Python/Python311/python.exe",
+  "python.analysis.extraPaths": [
+    "backend",
+    "backend/learning_path"
+  ],
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.typeCheckingMode": "off"
+}

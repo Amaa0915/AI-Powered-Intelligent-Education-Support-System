@@ -107,22 +107,26 @@ const RiskPredictionForm = () => {
       const records = grades.map(({ grade, avg, year }) => ({
         grade,
         year,
-        attendance_rate: Number(formData.attendance) || 0,
-        avg_score: avg,
-        Mathematics_score: avg,
-        Science_score: avg,
-        English_score: avg,
-        History_score: avg,
-        Sinhala_score: avg,
-        Buddhism_score: avg,
+        attendance_percentage: Number(formData.attendance) || 0,
+        average_score: avg,
         study_hours_per_week: Number(formData.studyHoursPerWeek) || 0,
-        iq_level: Number(formData.iqRate) || 100,
-        social_media_usage_hours: Number(formData.screenTimePerDay) || 0,
-        homework_completion_rate: hwRate,
         performance_trend: performanceTrend,
+        behavior_frequency: 0,
+        subject_marks: {
+          mathematics: avg,
+          science:     avg,
+          english:     avg,
+          history:     avg,
+          sinhala:     avg,
+          buddhism:    avg,
+        },
+        iq_level: Number(formData.iqRate) || 100,
+        homework_completion_rate: hwRate,
+        homework_on_time_rate: Math.min(hwRate + 0.05, 1.0),
+        screen_time_hours: Number(formData.screenTimePerDay) || 0,
       }));
 
-      await axios.post("http://localhost:5002/api/students", {
+      await axios.post("http://localhost:8000/api/students", {
         student_id: studentId,
         records,
       });

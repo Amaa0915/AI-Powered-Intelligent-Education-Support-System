@@ -27,15 +27,19 @@ const Sidebar = () => {
     navigate('/login', { replace: true });
   };
 
+  const C = { navy: '#272343', white: '#FFFFFF', mint: '#BAE8E8' };
+
   return (
-    <div className="fixed inset-y-0 left-0 w-64 bg-[#0f172a] text-white flex flex-col z-20">
+    <div className="fixed inset-y-0 left-0 w-64 flex flex-col z-20"
+        style={{ background: C.navy }}>
       <div className="flex items-center gap-3 p-6">
-        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500">
-          <BookOpen size={20} className="text-white" />
+        <div className="flex items-center justify-center w-8 h-8 rounded-lg"
+            style={{ background: C.mint }}>
+          <BookOpen size={20} style={{ color: C.navy }} />
         </div>
         <div>
-          <h2 className="text-lg font-bold leading-none">EduGuide</h2>
-          <span className="text-xs text-slate-400">Grade 11 • Sri Lanka</span>
+          <h2 className="text-lg font-bold leading-none" style={{ color: C.white }}>EduGuide</h2>
+          <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>Grade 11 • Sri Lanka</span>
         </div>
       </div>
 
@@ -44,12 +48,11 @@ const Sidebar = () => {
           <NavLink
             key={item.name}
             to={item.path}
-            className={({ isActive }) => `
-              flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
-              ${isActive
-                ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
-                : 'text-slate-400 hover:bg-slate-800 hover:text-white'}
-            `}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
+            style={({ isActive }) => ({
+              background: isActive ? C.mint : 'transparent',
+              color: isActive ? C.navy : 'rgba(255,255,255,0.65)',
+            })}
           >
             {item.icon}
             <span className="text-sm font-medium">{item.name}</span>
@@ -59,12 +62,11 @@ const Sidebar = () => {
         {isAdmin() && (
           <NavLink
             to="/admin/dashboard"
-            className={({ isActive }) => `
-              flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
-              ${isActive
-                ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/20'
-                : 'text-slate-400 hover:bg-slate-800 hover:text-white'}
-            `}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
+            style={({ isActive }) => ({
+              background: isActive ? C.mint : 'transparent',
+              color: isActive ? C.navy : 'rgba(255,255,255,0.65)',
+            })}
           >
             <Shield size={20} />
             <span className="text-sm font-medium">Admin Panel</span>
@@ -72,22 +74,23 @@ const Sidebar = () => {
         )}
       </nav>
 
-      <div className="px-4 py-4 space-y-3 border-t border-slate-800">
-        {/* User info */}
+      <div className="px-4 py-4 space-y-3" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         {user && (
           <div className="flex items-center gap-3 px-2">
-            <div className="flex items-center justify-center w-8 h-8 text-xs font-bold text-white rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 shrink-0">
+            <div className="flex items-center justify-center w-8 h-8 text-xs font-bold rounded-full shrink-0"
+                style={{ background: C.mint, color: C.navy }}>
               {user.name?.[0]?.toUpperCase() || '?'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-white truncate">{user.name}</p>
-              <p className="text-slate-500 text-[10px] truncate capitalize">{user.role}</p>
+              <p className="text-xs font-semibold truncate" style={{ color: C.white }}>{user.name}</p>
+              <p className="text-[10px] truncate capitalize" style={{ color: 'rgba(255,255,255,0.45)' }}>{user.role}</p>
             </div>
           </div>
         )}
         <button
           onClick={handleSignOut}
-          className="flex items-center w-full gap-3 px-4 py-2.5 transition-all rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white"
+          className="flex items-center w-full gap-3 px-4 py-2.5 transition-all rounded-xl"
+          style={{ color: 'rgba(255,255,255,0.65)' }}
         >
           <LogOut size={18} />
           <span className="text-sm font-medium">Sign Out</span>

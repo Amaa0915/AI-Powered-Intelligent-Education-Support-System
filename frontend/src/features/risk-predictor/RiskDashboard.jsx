@@ -270,7 +270,7 @@ const RiskDashboard = () => {
   useEffect(() => {
     if (!studentId) { setLoading(false); return; }
     axios
-      .get(`http://localhost:5002/api/risk/${studentId}`)
+      .get(`http://localhost:8000/api/risk/${studentId}`)
       .then((res) => setRiskData(res.data))
       .catch((err) => setError(err.response?.data?.error || err.message))
       .finally(() => setLoading(false));
