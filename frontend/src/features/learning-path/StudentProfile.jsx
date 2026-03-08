@@ -20,7 +20,7 @@ import Layout from '../../components/Layout';
 const StudentProfile = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [profile, setProfile] = useState(null);
+    const [profile, setProfile] = useState(null); 
     const [loading, setLoading] = useState(true);
     const [searchId, setSearchId] = useState('');
 

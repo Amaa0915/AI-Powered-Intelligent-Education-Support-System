@@ -19,7 +19,7 @@ const AddStudent = () => {
         student_type: 'balanced',
         subject_scores: {
             Sinhala: '',
-            Mathematics: '',
+            Mathematics: '', 
             Science: '',
             English: '',
             History: '',

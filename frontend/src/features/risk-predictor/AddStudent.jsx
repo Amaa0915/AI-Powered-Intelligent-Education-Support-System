@@ -167,7 +167,7 @@ const RiskPredictionForm = () => {
         records,
       };
 
-      console.log("Submitting payload:", payload);
+      console.log("Submitting payload:", payload); 
       const response = await axios.post(`${API_URLS.RISK_PREDICTOR_BACKEND}/api/students`, payload);
       console.log("Response:", response.data);
 
