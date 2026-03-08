@@ -75,10 +75,15 @@ def run_arima(series, steps, order=(2,1,2)):
     if len(series) < 4:
         last = float(np.mean(series)) if series else 75.0
         return series, [round(last,2)]*steps, list(order), False
+    # If series is constant (no variance), ARIMA can't model it — return mean directly
+    if len(set(round(v,1) for v in series)) == 1:
+        last = float(series[-1])
+        return series, [round(last,2)]*steps, [0,0,0], False
     for o in [order,(1,1,1),(1,0,1),(0,1,0),(1,0,0)]:
         try:
             m = _ARIMA(series, order=o).fit()
-            fc = list(np.round(np.clip(m.forecast(steps=steps), 0, 100), 2))
+            # Do NOT clip here — let caller apply adjustments first, then clip
+            fc = list(np.round(m.forecast(steps=steps), 2))
             return series, fc, list(o), True
         except Exception:
             continue
@@ -304,7 +309,7 @@ def student_impact():
 # ═══════════════════════════════════════════════════════════════════════════════
 # CONTEXTUAL PREDICTION — GradientBoosting
 # ═══════════════════════════════════════════════════════════════════════════════
-_gb_cache = None   # (model, le_weather, le_event, le_dow, le_dist)
+_gb_cache = None   # (model, le_weather, le_event, le_dow, le_dist) — trained on aggregated rates
 
 def _get_global_gb():
     global _gb_cache
@@ -312,34 +317,88 @@ def _get_global_gb():
         _gb_cache = _train_gb(get_db())
     return _gb_cache
 
+def _stats_predict(inp):
+    """Statistics-based prediction using domain-knowledge adjustments (fallback)."""
+    try:
+        db = get_db()
+        total   = db.attendances.estimated_document_count()
+        present = db.attendances.count_documents({'status': 'Present'})
+        baseline = (present / total * 100) if total > 0 else 80.0
+    except Exception:
+        baseline = 80.0
+    weather = (inp.get('weather') or 'sunny').lower()
+    event   = inp.get('school_event') or 'normal'
+    is_hol  = bool(inp.get('is_holiday', False))
+    temp    = float(inp.get('temperature', 28))
+    dkm     = float(inp.get('distance_km', 5))
+    adj = (WEATHER_ADJ.get(weather, 0.0)
+           + SL_EVENTS.get(event, (0.0,))[0]
+           + (-8.0 if is_hol else 0.0)
+           + (-1.5 if temp > 35 else -1.0 if temp < 15 else 0.0)
+           + dist_adj(dkm))
+    return round(float(np.clip(baseline + adj, 0, 100)), 2)
+
+
 def _train_gb(db, match=None):
+    """Train GBR on aggregated attendance RATES (not individual 0/1 records)."""
     from sklearn.ensemble import GradientBoostingRegressor
     from sklearn.preprocessing import LabelEncoder
 
-    proj = {'status':1,'weather_condition':1,'school_event':1,'day_of_week':1,
-            'distance_band':1,'is_holiday':1,'temperature':1,'month':1,'distance_km':1,'_id':0}
-    q = match or {}
-    records = list(db.attendances.find(q, proj, limit=15000))
-    df = pd.DataFrame(records)
-    if df.empty or len(df) < 10:
+    # Aggregate by feature combination → actual rates (0-100)
+    pipeline = [
+        {'$match': match or {}},
+        {'$group': {
+            '_id': {
+                'weather': '$weather_condition',
+                'event':   '$school_event',
+                'dow':     '$day_of_week',
+                'month':   '$month',
+                'is_hol':  '$is_holiday',
+                'dist_b':  '$distance_band',
+            },
+            'total':    {'$sum': 1},
+            'present':  {'$sum': {'$cond': [{'$eq': ['$status', 'Present']}, 1, 0]}},
+            'avg_temp': {'$avg': '$temperature'},
+            'avg_dkm':  {'$avg': '$distance_km'},
+        }},
+        {'$match': {'total': {'$gte': 5}}},
+    ]
+    rows = list(db.attendances.aggregate(pipeline))
+    if len(rows) < 5:
         return None
 
-    le_w = LabelEncoder(); le_e = LabelEncoder(); le_d = LabelEncoder(); le_b = LabelEncoder()
-    df['w_enc'] = le_w.fit_transform(df['weather_condition'].fillna('sunny'))
-    df['e_enc'] = le_e.fit_transform(df['school_event'].fillna('normal'))
-    df['d_enc'] = le_d.fit_transform(df['day_of_week'].fillna('Monday'))
-    df['b_enc'] = le_b.fit_transform(df['distance_band'].fillna('Nearby'))
-    df['hol']   = df['is_holiday'].fillna(False).astype(int)
-    df['temp']  = pd.to_numeric(df['temperature'],  errors='coerce').fillna(28)
-    df['mon']   = pd.to_numeric(df['month'],         errors='coerce').fillna(6)
-    df['dkm']   = pd.to_numeric(df['distance_km'],   errors='coerce').fillna(5)
-    df['y']     = (df['status'] == 'Present').astype(int)
+    records = []
+    for r in rows:
+        i = r['_id']
+        records.append({
+            'weather':   (i.get('weather') or 'sunny'),
+            'event':     (i.get('event')   or 'normal'),
+            'dow':       (i.get('dow')     or 'Monday'),
+            'month':     int(i.get('month') or 6),
+            'is_hol':    int(bool(i.get('is_hol', False))),
+            'dist_band': (i.get('dist_b')  or 'Nearby'),
+            'temp':      float(r.get('avg_temp') or 28),
+            'dkm':       float(r.get('avg_dkm')  or 5),
+            'rate':      r['present'] / r['total'] * 100,
+            'weight':    r['total'],
+        })
 
-    feats = ['w_enc','e_enc','d_enc','b_enc','hol','temp','mon','dkm']
-    X, y  = df[feats].values, df['y'].values
-    model = GradientBoostingRegressor(n_estimators=120, max_depth=4,
-                                      learning_rate=0.1, random_state=42)
-    model.fit(X, y)
+    df = pd.DataFrame(records)
+    le_w = LabelEncoder(); le_e = LabelEncoder(); le_d = LabelEncoder(); le_b = LabelEncoder()
+    df['w_enc'] = le_w.fit_transform(df['weather'])
+    df['e_enc'] = le_e.fit_transform(df['event'])
+    df['d_enc'] = le_d.fit_transform(df['dow'])
+    df['b_enc'] = le_b.fit_transform(df['dist_band'])
+
+    feats = ['w_enc', 'e_enc', 'd_enc', 'b_enc', 'is_hol', 'temp', 'month', 'dkm']
+    X = df[feats].values
+    y = df['rate'].values
+    weights = np.sqrt(df['weight'].values)
+
+    model = GradientBoostingRegressor(n_estimators=200, max_depth=4,
+                                      learning_rate=0.05, random_state=42,
+                                      subsample=0.9)
+    model.fit(X, y, sample_weight=weights)
     return model, le_w, le_e, le_d, le_b
 
 def _safe_enc(le, val, default=0):
@@ -347,7 +406,9 @@ def _safe_enc(le, val, default=0):
     except: return default
 
 def _predict_one(bundle, inp):
-    if bundle is None: return 75.0
+    # None bundle → use stats-based fallback instead of fixed 75.0
+    if bundle is None:
+        return _stats_predict(inp)
     model, le_w, le_e, le_d, le_b = bundle
     w_enc = _safe_enc(le_w, inp.get('weather','sunny'))
     e_enc = _safe_enc(le_e, inp.get('school_event','normal'))
@@ -359,7 +420,8 @@ def _predict_one(bundle, inp):
                    float(inp.get('temperature',28)),
                    int(inp.get('month',6)),
                    float(inp.get('distance_km',5))]])
-    return round(float(np.clip(model.predict(X)[0]*100, 0, 100)), 2)
+    # Model now predicts rates 0-100 directly (trained on aggregated rates, NOT 0/1)
+    return round(float(np.clip(model.predict(X)[0], 0, 100)), 2)
 
 _FEAT_NAMES = ['Weather','School Event','Day of Week','Distance Band',
                'Is Holiday','Temperature','Month','Distance (km)']
@@ -564,7 +626,7 @@ def guest_trend():
         day_name = day_date.strftime('%A')
 
         week_idx  = min(i//5, len(fc_weekly)-1)
-        arima_val = float(np.clip(fc_weekly[week_idx] if fc_weekly else hist_rate, 0, 100))
+        arima_val = float(np.clip(fc_weekly[week_idx] if fc_weekly else hist_rate, 50, 100))
 
         event_adj_val = 0.0
         is_holiday    = False

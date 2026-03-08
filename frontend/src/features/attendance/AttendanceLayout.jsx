@@ -2,17 +2,9 @@ import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import Sidebar from '../../components/Sidebar';
 import Topbar from '../../components/Topbar';
-import {
-  LayoutDashboard, Users, AlertTriangle,
-  TrendingUp, Brain, Layers
-} from 'lucide-react';
+import { Layers } from 'lucide-react';
 
 const subNav = [
-  { to: '/attendance',            label: 'Dashboard',           icon: LayoutDashboard, end: true },
-  { to: '/attendance/students',   label: 'Students',            icon: Users },
-  { to: '/attendance/anomalies',  label: 'Anomaly Report',      icon: AlertTriangle },
-  { to: '/attendance/trends',     label: 'Trends & Analytics',  icon: TrendingUp },
-  { to: '/attendance/forecast',   label: 'AI Forecasting',      icon: Brain },
   { to: '/attendance/contextual', label: 'Contextual Impact',   icon: Layers },
 ];
 

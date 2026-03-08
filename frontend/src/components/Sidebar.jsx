@@ -19,8 +19,8 @@ const Sidebar = () => {
     { name: 'Learning Path',      icon: <Home          size={20} />, path: '/add-student' },
     { name: 'Risk Predictor',     icon: <Target        size={20} />, path: '/risk-predictor' },
     { name: 'Stress Prediction',  icon: <Activity      size={20} />, path: '/stress' },
-    { name: 'Attendance Trends',  icon: <CalendarCheck size={20} />, path: '/attendance' },
-  ];
+    { name: 'Attendance Trends',  icon: <CalendarCheck size={20} />, path: '/attendance/contextual' },
+  ].filter(item => !['Dashboard', 'Students', 'Anomaly Report', 'Trends & Analytics', 'AI Forecasting'].includes(item.name));
 
   const handleSignOut = () => {
     clearAuth();
@@ -72,15 +72,15 @@ const Sidebar = () => {
         )}
       </nav>
 
-      <div className="px-4 py-4 border-t border-slate-800 space-y-3">
+      <div className="px-4 py-4 space-y-3 border-t border-slate-800">
         {/* User info */}
         {user && (
           <div className="flex items-center gap-3 px-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+            <div className="flex items-center justify-center w-8 h-8 text-xs font-bold text-white rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 shrink-0">
               {user.name?.[0]?.toUpperCase() || '?'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white text-xs font-semibold truncate">{user.name}</p>
+              <p className="text-xs font-semibold text-white truncate">{user.name}</p>
               <p className="text-slate-500 text-[10px] truncate capitalize">{user.role}</p>
             </div>
           </div>

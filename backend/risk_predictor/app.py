@@ -280,54 +280,116 @@ def save_student():
             'buddhism': 'Buddhism_score',
         }
 
-        trend_map = {'Improving': 5, 'Stable': 0, 'Declining': -5}
+        # Top-level field aliases for each subject (new simplified form sends these directly)
+        subject_top_level = {
+            'mathematics': ['Mathematics_score', 'mathematics_score'],
+            'science':     ['Science_score',     'science_score'],
+            'english':     ['English_score',     'english_score'],
+            'history':     ['History_score',     'history_score'],
+            'sinhala':     ['Sinhala_score',     'sinhala_score'],
+            'buddhism':    ['Buddhism_score',    'buddhism_score'],
+        }
 
         timestamp = datetime.now()
         transformed_records = []
         for record in records:
+            # ── Subject scores: check subject_marks dict first, then top-level fields ──
             subject_marks = record.get('subject_marks', {})
-            subject_scores = [float(subject_marks.get(k, 0)) for k in subject_map.keys()]
-            avg_score = float(record.get('average_score', 0)) or (sum(subject_scores) / len(subject_scores) if subject_scores else 0)
+            subj_vals = {}
+            for form_key, top_keys in subject_top_level.items():
+                val = float(subject_marks.get(form_key, 0))
+                if val == 0:
+                    for k in top_keys:
+                        raw = record.get(k)
+                        if raw not in (None, '', 0):
+                            val = float(raw)
+                            break
+                subj_vals[form_key] = val
 
-            weak = sum(1 for s in subject_scores if s < 50)
-            failing = sum(1 for s in subject_scores if s < 35)
-            score_std = float(np.std(subject_scores)) if subject_scores else 0
+            subject_scores = list(subj_vals.values())
+
+            # ── avg_score: support both field names; fall back to mean of subjects ──
+            avg_raw = record.get('avg_score', record.get('average_score'))
+            if avg_raw not in (None, '', 0):
+                avg_score = float(avg_raw)
+            elif any(s > 0 for s in subject_scores):
+                avg_score = sum(subject_scores) / len(subject_scores)
+            else:
+                avg_score = 0.0
+
+            # If only avg given (no individual scores), use avg for all subjects
+            if avg_score > 0 and all(s == 0 for s in subject_scores):
+                subject_scores = [avg_score] * len(subject_scores)
+                for k in subj_vals:
+                    subj_vals[k] = avg_score
+
+            weak     = sum(1 for s in subject_scores if s < 50)
+            failing  = sum(1 for s in subject_scores if s < 35)
+            score_std = float(np.std(subject_scores)) if any(s > 0 for s in subject_scores) else 0.0
+            min_score = min(subject_scores) if any(s > 0 for s in subject_scores) else 0.0
+            max_score = max(subject_scores) if any(s > 0 for s in subject_scores) else 0.0
+
+            # ── Attendance: support both field names ──
+            attendance = float(record.get('attendance_rate', record.get('attendance_percentage', 0)))
+            days_present = round(attendance * 1.8)   # approx out of 180 school days
+
+            # ── User-provided study / behaviour fields ──
+            study_hours    = float(record.get('study_hours_per_week', 5))
+            iq_level       = float(record.get('iq_level', 100))
+            hw_completion  = float(record.get('homework_completion_rate', 0.7))
+            screen_time    = float(record.get('social_media_usage_hours', 2))
+
+            # ── Derived risk score proxies ──
+            attendance_risk_score = max(0.0, round((85.0 - attendance) / 85.0, 4))
+            academic_risk_score   = max(0.0, round((60.0 - avg_score)  / 60.0, 4))
+            behavioral_risk_score = max(0.0, round(1.0 - hw_completion, 4))
+
+            has_tuition = 1 if study_hours > 12 else 0
 
             transformed = {
-                'student_id': student_id,
-                'grade': int(record.get('grade', 10)),
-                'year': int(record.get('year', 2025)),
-                'attendance_rate': float(record.get('attendance_percentage', 0)),
-                'avg_score': avg_score,
-                'study_hours_per_week': float(record.get('study_hours_per_week', 0)),
-                'performance_trend_value': trend_map.get(record.get('performance_trend', 'Stable'), 0),
-                'disciplinary_actions': int(record.get('behavior_frequency', 0)),
-                **{model_key: float(subject_marks.get(form_key, 0)) for form_key, model_key in subject_map.items()},
-                'weak_subjects': weak,
-                'failing_subjects': failing,
-                'score_std': score_std,
-                'homework_completion_rate': 0.8,
-                'classwork_completion_rate': 0.8,
-                'lms_engagement_score': 0.7,
-                'parent_engagement_score': 0.7,
-                'iq_level': 100,
-                'health_status': 'Good',
-                'homework_on_time_rate': 0.9,
-                'has_learning_difficulty': 0,
+                'student_id':               student_id,
+                'grade':                    int(record.get('grade', 10)),
+                'year':                     int(record.get('year', 2025)),
+                'attendance_rate':          attendance,
+                'days_present':             days_present,
+                'avg_score':                avg_score,
+                'score_std':                score_std,
+                'min_score':                min_score,
+                'max_score':                max_score,
+                'study_hours_per_week':     study_hours,
+                'iq_level':                 iq_level,
+                'social_media_usage_hours': screen_time,
+                'homework_completion_rate': hw_completion,
+                'homework_on_time_rate':    round(hw_completion * 0.95, 4),
+                'classwork_completion_rate':round(hw_completion * 0.90, 4),
+                'lms_engagement_score':     0.7,
+                'parent_engagement_score':  0.7,
+                'weak_subjects':            weak,
+                'failing_subjects':         failing,
+                'attendance_risk_score':    attendance_risk_score,
+                'academic_risk_score':      academic_risk_score,
+                'behavioral_risk_score':    behavioral_risk_score,
+                'has_tuition':              has_tuition,
+                'has_learning_difficulty':  0,
+                'health_status':            'Good',
+                'health_incidents':         0,
                 'extracurricular_participation': 1,
-                'travel_time_to_school': 20,
-                'sleep_hours_per_night': 8,
-                'social_media_usage_hours': 1,
-                'peer_influence_score': 0.5,
-                'financial_status_score': 0.8,
-                'family_support_score': 0.9,
-                'teacher_support_score': 0.9,
+                'travel_time_to_school':    20,
+                'sleep_hours_per_night':    8,
+                'peer_influence_score':     0.5,
+                'financial_status_score':   0.8,
+                'family_support_score':     0.9,
+                'teacher_support_score':    0.9,
                 'school_environment_score': 0.9,
                 'counseling_sessions_attended': 0,
-                'previous_year_fail': 0,
-                'resource_availability': 0.9,
-                'motivation_level': 0.8,
-                'standardized_test_score': avg_score,
+                'previous_year_fail':       1 if avg_score < 40 else 0,
+                'resource_availability':    0.9,
+                'motivation_level':         0.8,
+                'standardized_test_score':  avg_score,
+                'parent_meeting_attendance_rate': 0.7,
+                'lms_time_hours':           2.0,
+                'absences_due_to_sickness': 0,
+                **{model_key: subj_vals[form_key] for form_key, model_key in subject_map.items()},
                 'created_at': timestamp,
             }
             transformed_records.append(transformed)

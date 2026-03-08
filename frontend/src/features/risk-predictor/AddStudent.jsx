@@ -1,300 +1,394 @@
-import React, { useMemo, useState } from "react";
-import axios from "axios";
+﻿import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Save } from "lucide-react";
-import { API_URLS } from "../../api/config";
+import axios from "axios";
+import {
+  ArrowLeft,
+  Save,
+  School,
+  BookOpen,
+  Brain,
+  TrendingDown,
+  Percent,
+  Clock3,
+  MonitorSmartphone,
+} from "lucide-react";
 
-const GRADES = [8, 9, 10];
-
-const SUBJECTS = [
-  { key: "mathematics", label: "Mathematics" },
-  { key: "science", label: "Science" },
-  { key: "english", label: "English" },
-  { key: "history", label: "History" },
-  { key: "sinhala", label: "Sinhala" },
-  { key: "buddhism", label: "Buddhism" },
-];
-
-const makeGradeState = (grade, year) => ({
-  grade,
-  year,
-  attendance_percentage: "",
-  average_score: "",
-  performance_trend: "",
-  behavior_frequency: "",
-  study_hours_per_week: "",
-  subject_marks: {
-    mathematics: "",
-    science: "",
-    english: "",
-    history: "",
-    sinhala: "",
-    buddhism: "",
-  },
-});
-
-const clampNumber = (value, min, max) => {
-  const n = Number(value);
-  if (Number.isNaN(n)) return "";
-  return Math.min(max, Math.max(min, n));
+const clamp = (value, min, max) => {
+  if (value === "") return "";
+  const num = Number(value);
+  if (Number.isNaN(num)) return "";
+  return Math.min(max, Math.max(min, num));
 };
 
-const AddStudent = () => {
+const getTrend = (g8, g9, g10) => {
+  if (g8 === "" || g9 === "" || g10 === "") return "—";
+  const n8 = Number(g8);
+  const n9 = Number(g9);
+  const n10 = Number(g10);
+  if (n8 < n9 && n9 < n10) return "Improving";
+  if (n8 > n9 && n9 > n10) return "Declining";
+  return "Stable";
+};
+
+const RiskPredictionForm = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState(8);
-  const [studentId, setStudentId] = useState("");
-  const [error, setError] = useState(null);
-  const [saving, setSaving] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const [gradesData, setGradesData] = useState(() => ({
-    8: makeGradeState(8, 2023),
-    9: makeGradeState(9, 2024),
-    10: makeGradeState(10, 2025),
-  }));
+  const [formData, setFormData] = useState({
+    attendance: "",
+    grade8Average: "",
+    grade9Average: "",
+    grade10Average: "",
+    homeworkCompletion: "Often",
+    studyHoursPerWeek: "",
+    iqRate: "",
+    screenTimePerDay: "",
+  });
 
-  const current = gradesData[activeTab];
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-  const computedAverage = useMemo(() => {
-    const marks = Object.values(current.subject_marks).map(Number);
-    const valid = marks.filter((m) => !Number.isNaN(m));
-    if (!valid.length) return 0;
-    return Math.round((valid.reduce((a, b) => a + b, 0) / valid.length) * 10) / 10;
-  }, [current.subject_marks]);
+    const numericFields = [
+      "attendance",
+      "grade8Average",
+      "grade9Average",
+      "grade10Average",
+      "studyHoursPerWeek",
+      "iqRate",
+      "screenTimePerDay",
+    ];
 
-  const updateGradeField = (grade, name, value) => {
-    setGradesData((prev) => ({
-      ...prev,
-      [grade]: { ...prev[grade], [name]: value },
-    }));
-  };
-
-  const updateSubject = (grade, subjectKey, value) => {
-    setGradesData((prev) => ({
-      ...prev,
-      [grade]: {
-        ...prev[grade],
-        subject_marks: {
-          ...prev[grade].subject_marks,
-          [subjectKey]: value,
-        },
-      },
-    }));
-  };
-
-  const cloneToNext = (fromGrade) => {
-    if (fromGrade >= 10) return;
-    const next = fromGrade + 1;
-    setGradesData((prev) => ({
-      ...prev,
-      [next]: {
-        ...prev[fromGrade],
-        grade: next,
-        year: prev[fromGrade].year + 1,
-      },
-    }));
-    setActiveTab(next);
-  };
-
-  const validateAll = () => {
-    if (!studentId.trim()) return "Student ID is required.";
-    for (const g of GRADES) {
-      const d = gradesData[g];
-      if (!d.year) return `Year is required for Grade ${g}.`;
-      if (d.attendance_percentage === "" || d.attendance_percentage == null)
-        return `Attendance % is required for Grade ${g}.`;
-      if (d.average_score === "" || d.average_score == null)
-        return `Average score is required for Grade ${g}.`;
-      for (const s of SUBJECTS) {
-        const v = d.subject_marks[s.key];
-        if (v === "" || v == null) return `${s.label} mark is required for Grade ${g}.`;
+    if (numericFields.includes(name)) {
+      let newValue = value;
+      if (
+        name === "attendance" ||
+        name === "grade8Average" ||
+        name === "grade9Average" ||
+        name === "grade10Average"
+      ) {
+        newValue = clamp(value, 0, 100);
+      } else if (name === "iqRate") {
+        newValue = clamp(value, 50, 200);
+      } else {
+        newValue = value === "" ? "" : Number(value);
       }
+      setFormData((prev) => ({ ...prev, [name]: newValue }));
+      return;
     }
-    return null;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  const averageScore = useMemo(() => {
+    const { grade8Average, grade9Average, grade10Average } = formData;
+    if (grade8Average === "" || grade9Average === "" || grade10Average === "") return "—";
+    const avg = (Number(grade8Average) + Number(grade9Average) + Number(grade10Average)) / 3;
+    return avg.toFixed(1);
+  }, [formData.grade8Average, formData.grade9Average, formData.grade10Average]);
+
+  const performanceTrend = useMemo(
+    () => getTrend(formData.grade8Average, formData.grade9Average, formData.grade10Average),
+    [formData.grade8Average, formData.grade9Average, formData.grade10Average]
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const v = validateAll();
-    if (v) {
-      setError(v);
-      return;
-    }
-
-    setError(null);
-    setSaving(true);
+    setSubmitting(true);
     try {
-      const payload = {
-        student_id: studentId.trim(),
-        records: GRADES.map((g) => gradesData[g]),
-      };
-      await axios.post(`${API_URLS.RISK_PREDICTOR_BACKEND}/api/students`, payload);
-      alert("Student multi-grade data saved successfully!");
-      navigate(`/risk-predictor?studentId=${encodeURIComponent(studentId.trim())}`);
+      const studentId = `STU${Date.now()}`;
+      const hwMap = { Often: 0.85, Sometimes: 0.6, Rarely: 0.3 };
+      const hwRate = hwMap[formData.homeworkCompletion] || 0.6;
+
+      const grades = [
+        { grade: 8, avg: Number(formData.grade8Average) || 0, year: 2022 },
+        { grade: 9, avg: Number(formData.grade9Average) || 0, year: 2023 },
+        { grade: 10, avg: Number(formData.grade10Average) || 0, year: 2024 },
+      ];
+
+      const records = grades.map(({ grade, avg, year }) => ({
+        grade,
+        year,
+        attendance_rate: Number(formData.attendance) || 0,
+        avg_score: avg,
+        Mathematics_score: avg,
+        Science_score: avg,
+        English_score: avg,
+        History_score: avg,
+        Sinhala_score: avg,
+        Buddhism_score: avg,
+        study_hours_per_week: Number(formData.studyHoursPerWeek) || 0,
+        iq_level: Number(formData.iqRate) || 100,
+        social_media_usage_hours: Number(formData.screenTimePerDay) || 0,
+        homework_completion_rate: hwRate,
+        performance_trend: performanceTrend,
+      }));
+
+      await axios.post("http://localhost:5002/api/students", {
+        student_id: studentId,
+        records,
+      });
+
+      localStorage.setItem("riskFormData", JSON.stringify({ ...formData, studentId }));
+      navigate(`/risk-predictor?studentId=${studentId}`);
     } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.error || "Failed to save student data.");
+      console.error("Submit error:", err);
+      alert("Failed to save data. Please try again.");
     } finally {
-      setSaving(false);
+      setSubmitting(false);
     }
   };
 
+  const trendColor =
+    performanceTrend === "Improving"
+      ? "text-emerald-600 bg-emerald-50 border-emerald-200"
+      : performanceTrend === "Declining"
+      ? "text-red-600 bg-red-50 border-red-200"
+      : "text-amber-600 bg-amber-50 border-amber-200";
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="px-6 py-10 lg:py-12">
-        <div className="mx-auto max-w-6xl">
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div className="flex flex-col gap-4 border-b border-slate-100 p-6 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <h1 className="text-xl lg:text-2xl font-bold text-slate-900">
-                  Add Multi-Grade Performance Data
-                </h1>
-                <p className="text-sm text-slate-500 mt-1">
-                  Enter Grade 8–10 marks and attendance to predict O/L risk.
-                </p>
-              </div>
-              <div className="flex w-full lg:w-auto items-center rounded-xl bg-slate-100 p-1">
-                {GRADES.map((g) => (
-                  <button key={g} type="button" onClick={() => setActiveTab(g)}
-                    className={`w-full lg:w-auto px-5 py-2 rounded-lg text-sm font-semibold transition
-                      ${activeTab === g ? "bg-white text-blue-700 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}>
-                    Grade {g}
-                  </button>
-                ))}
-              </div>
+    <div className="min-h-screen bg-slate-100 px-4 py-8 md:px-8">
+      <div className="mx-auto max-w-6xl">
+        <button
+          onClick={() => navigate("/")}
+          className="mb-6 inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 font-medium transition"
+        >
+          <ArrowLeft size={18} />
+          Back
+        </button>
+
+        {/* Header */}
+        <div className="mb-6 rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 p-6 text-white shadow-lg">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold">
+                Student Risk Assessment Form
+              </h1>
+              <p className="mt-2 text-sm md:text-base text-white/90">
+                Enter simple academic and study details to predict student risk
+                in a user-friendly way.
+              </p>
             </div>
-
-            {error && (
-              <div className="mx-6 mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="p-6 lg:p-8">
-              <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-blue-900">
-                  Student Identity (Main Identifier)
-                </label>
-                <input type="text" value={studentId} onChange={(e) => setStudentId(e.target.value)}
-                  placeholder="Enter unique Student ID (e.g., STU1234)"
-                  className="mt-3 w-full rounded-xl border border-blue-200 bg-white px-4 py-3 text-base font-semibold text-slate-900 outline-none focus:ring-2 focus:ring-blue-500"
-                  required />
-              </div>
-
-              <div className="mt-8 grid gap-8 lg:grid-cols-12">
-                <div className="lg:col-span-7 space-y-7">
-                  <section className="rounded-2xl border border-slate-200 p-5">
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="h-6 w-2 rounded-full bg-blue-500" />
-                      <h3 className="text-base font-bold text-slate-900">Grade {activeTab} Academics</h3>
-                    </div>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div>
-                        <label className="block text-xs font-bold uppercase text-slate-500">Year</label>
-                        <input type="number" value={current.year}
-                          onChange={(e) => updateGradeField(activeTab, "year", clampNumber(e.target.value, 2000, 2100))}
-                          className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500" required />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold uppercase text-slate-500">Attendance %</label>
-                        <input type="number" value={current.attendance_percentage}
-                          onChange={(e) => updateGradeField(activeTab, "attendance_percentage", clampNumber(e.target.value, 0, 100))}
-                          className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500" min={0} max={100} required />
-                      </div>
-                      <div className="sm:col-span-2">
-                        <label className="block text-xs font-bold uppercase text-slate-500">Average Score %</label>
-                        <div className="mt-2 grid gap-3 sm:grid-cols-3">
-                          <input type="number" value={current.average_score}
-                            onChange={(e) => updateGradeField(activeTab, "average_score", clampNumber(e.target.value, 0, 100))}
-                            className="sm:col-span-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500" min={0} max={100} required />
-                          <div className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 flex items-center justify-between">
-                            <span className="text-slate-500">From subjects</span>
-                            <span>{computedAverage}%</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </section>
-
-                  <section className="rounded-2xl border border-slate-200 p-5">
-                    <h3 className="text-base font-bold text-slate-900 mb-4">Subject-wise Scores (0–100)</h3>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      {SUBJECTS.map((s) => (
-                        <div key={s.key}>
-                          <label className="block text-xs font-bold uppercase text-slate-500">{s.label}</label>
-                          <input type="number" value={current.subject_marks[s.key]}
-                            onChange={(e) => updateSubject(activeTab, s.key, clampNumber(e.target.value, 0, 100))}
-                            className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500" min={0} max={100} required />
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-                </div>
-
-                <div className="lg:col-span-5 space-y-7">
-                  <section className="rounded-2xl border border-slate-200 p-5">
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="h-6 w-2 rounded-full bg-emerald-500" />
-                      <h3 className="text-base font-bold text-slate-900">Behavior & Engagement</h3>
-                    </div>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div>
-                        <label className="block text-xs font-bold uppercase text-slate-500">Performance Trend</label>
-                        <select value={current.performance_trend}
-                          onChange={(e) => updateGradeField(activeTab, "performance_trend", e.target.value)}
-                          className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
-                          <option value="" disabled>Select trend</option>
-                          <option value="Improving">Improving</option>
-                          <option value="Stable">Stable</option>
-                          <option value="Declining">Declining</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold uppercase text-slate-500">Behavior Frequency</label>
-                        <input type="number" value={current.behavior_frequency}
-                          onChange={(e) => updateGradeField(activeTab, "behavior_frequency", clampNumber(e.target.value, 0, 999))}
-                          className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 outline-none focus:ring-2 focus:ring-emerald-500" min={0} />
-                      </div>
-                      <div className="sm:col-span-2">
-                        <label className="block text-xs font-bold uppercase text-slate-500">Study Hours / Week</label>
-                        <input type="number" value={current.study_hours_per_week}
-                          onChange={(e) => updateGradeField(activeTab, "study_hours_per_week", clampNumber(e.target.value, 0, 80))}
-                          className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 outline-none focus:ring-2 focus:ring-emerald-500" min={0} />
-                      </div>
-                    </div>
-                  </section>
-
-                  <div className="rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 p-6 text-white shadow-lg">
-                    <div className="flex items-center gap-2 font-bold">
-                      <span className="rounded bg-white/20 px-2 py-1">✨</span>
-                      Efficiency Tip
-                    </div>
-                    <p className="mt-2 text-xs text-indigo-100 leading-relaxed">
-                      You can copy Grade {activeTab} values to the next grade to save time.
-                    </p>
-                    <button type="button" disabled={activeTab === 10} onClick={() => cloneToNext(activeTab)}
-                      className="mt-4 w-full rounded-xl bg-white py-3 font-bold text-indigo-700 hover:bg-white/90 transition disabled:opacity-50 disabled:cursor-not-allowed">
-                      Clone to Grade {activeTab + 1}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-8 flex flex-col gap-4 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-sm text-slate-500 italic">
-                  Please fill data for all three grades for accurate prediction.
-                </p>
-                <button type="submit" disabled={saving}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-10 py-3.5 font-bold text-white shadow-lg shadow-emerald-100 hover:bg-emerald-700 transition disabled:opacity-60">
-                  <Save size={18} />
-                  {saving ? "Saving..." : "Save & Finish Assessment"}
-                </button>
-              </div>
-            </form>
+            <div className="rounded-2xl bg-white/15 px-4 py-3 text-sm backdrop-blur-sm">
+              Easy to fill • School friendly • Auto indicators
+            </div>
           </div>
         </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Top grid */}
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* School Records */}
+            <section className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+              <div className="mb-5 flex items-center gap-3">
+                <div className="rounded-2xl bg-blue-100 p-3 text-blue-600">
+                  <School size={22} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900">School Records</h2>
+                  <p className="text-sm text-slate-500">Basic attendance information</p>
+                </div>
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Attendance Percentage
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    name="attendance"
+                    value={formData.attendance}
+                    onChange={handleChange}
+                    placeholder="Enter attendance %"
+                    min="0"
+                    max="100"
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 pr-12 text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                  />
+                  <Percent size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+              </div>
+            </section>
+
+            {/* Study Behaviour */}
+            <section className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+              <div className="mb-5 flex items-center gap-3">
+                <div className="rounded-2xl bg-purple-100 p-3 text-purple-600">
+                  <Brain size={22} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900">Study Behaviour</h2>
+                  <p className="text-sm text-slate-500">Learning habits and daily routine</p>
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="md:col-span-2">
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">
+                    Homework Completion
+                  </label>
+                  <select
+                    name="homeworkCompletion"
+                    value={formData.homeworkCompletion}
+                    onChange={handleChange}
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-purple-400 focus:bg-white focus:ring-4 focus:ring-purple-100"
+                  >
+                    <option value="Often">Often</option>
+                    <option value="Sometimes">Sometimes</option>
+                    <option value="Rarely">Rarely</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">
+                    Study Hours / Week
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      name="studyHoursPerWeek"
+                      value={formData.studyHoursPerWeek}
+                      onChange={handleChange}
+                      placeholder="e.g. 10"
+                      min="0"
+                      className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 pr-12 text-slate-900 outline-none transition focus:border-purple-400 focus:bg-white focus:ring-4 focus:ring-purple-100"
+                    />
+                    <Clock3 size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                  </div>
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">
+                    Screen Time / Day
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      name="screenTimePerDay"
+                      value={formData.screenTimePerDay}
+                      onChange={handleChange}
+                      placeholder="e.g. 3"
+                      min="0"
+                      className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 pr-12 text-slate-900 outline-none transition focus:border-purple-400 focus:bg-white focus:ring-4 focus:ring-purple-100"
+                    />
+                    <MonitorSmartphone size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                  </div>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">
+                    IQ Rate
+                  </label>
+                  <input
+                    type="number"
+                    name="iqRate"
+                    value={formData.iqRate}
+                    onChange={handleChange}
+                    placeholder="Enter IQ rate"
+                    min="50"
+                    max="200"
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-purple-400 focus:bg-white focus:ring-4 focus:ring-purple-100"
+                  />
+                </div>
+              </div>
+            </section>
+          </div>
+
+          {/* Academic Performance */}
+          <section className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="rounded-2xl bg-emerald-100 p-3 text-emerald-600">
+                <BookOpen size={22} />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">Academic Performance</h2>
+                <p className="text-sm text-slate-500">
+                  Enter yearly average marks instead of many subject marks
+                </p>
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-2xl bg-emerald-50 p-4 border border-emerald-100">
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Grade 8 Average %
+                </label>
+                <input
+                  type="number"
+                  name="grade8Average"
+                  value={formData.grade8Average}
+                  onChange={handleChange}
+                  placeholder="Enter Grade 8 average"
+                  min="0"
+                  max="100"
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100"
+                />
+              </div>
+              <div className="rounded-2xl bg-emerald-50 p-4 border border-emerald-100">
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Grade 9 Average %
+                </label>
+                <input
+                  type="number"
+                  name="grade9Average"
+                  value={formData.grade9Average}
+                  onChange={handleChange}
+                  placeholder="Enter Grade 9 average"
+                  min="0"
+                  max="100"
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100"
+                />
+              </div>
+              <div className="rounded-2xl bg-emerald-50 p-4 border border-emerald-100">
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Grade 10 Average %
+                </label>
+                <input
+                  type="number"
+                  name="grade10Average"
+                  value={formData.grade10Average}
+                  onChange={handleChange}
+                  placeholder="Enter Grade 10 average"
+                  min="0"
+                  max="100"
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100"
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Auto Indicators */}
+          <section className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="rounded-2xl bg-amber-100 p-3 text-amber-600">
+                <TrendingDown size={22} />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">System Indicators</h2>
+                <p className="text-sm text-slate-500">These values are calculated automatically</p>
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <p className="text-sm font-medium text-slate-500">Overall Average Score</p>
+                <p className="mt-2 text-3xl font-bold text-slate-900">
+                  {averageScore === "—" ? "—" : `${averageScore}%`}
+                </p>
+              </div>
+              <div className={`rounded-2xl border p-5 ${trendColor}`}>
+                <p className="text-sm font-medium">Performance Trend</p>
+                <p className="mt-2 text-3xl font-bold">{performanceTrend}</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Submit */}
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={submitting}
+              className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-8 py-3.5 font-bold text-white shadow-md transition hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Save size={18} />
+              {submitting ? "Saving..." : "Submit & Analyze Risk"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
 };
 
-export default AddStudent;
+export default RiskPredictionForm;
