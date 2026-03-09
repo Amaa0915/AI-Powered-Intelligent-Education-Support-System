@@ -62,10 +62,7 @@ export default function LoginPage() {
 
             <div className="w-full max-w-md relative z-10">
                 <Link to="/" className="flex items-center justify-center gap-2 mb-8">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
-                        style={{ background: C.navy }}>
-                        <BookOpen size={18} style={{ color: C.mint }} />
-                    </div>
+                    <img src="/src/assets/images/EduGuidelogo11.png" alt="EduGuide Logo" className="h-12 w-auto rounded-xl shadow-md" />
                     <span className="font-black text-xl" style={{ color: C.navy }}>EduGuide</span>
                 </Link>
 

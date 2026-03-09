@@ -33,14 +33,11 @@ const Sidebar = () => {
     <div className="fixed inset-y-0 left-0 w-64 flex flex-col z-20"
         style={{ background: C.navy }}>
       <div className="flex items-center gap-3 p-6">
-        <div className="flex items-center justify-center w-8 h-8 rounded-lg"
-            style={{ background: C.mint }}>
-          <BookOpen size={20} style={{ color: C.navy }} />
-        </div>
-        <div>
-          <h2 className="text-lg font-bold leading-none" style={{ color: C.white }}>EduGuide</h2>
-          <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>Grade 11 • Sri Lanka</span>
-        </div>
+        <a href="/" className="flex items-center gap-2">
+          <img src="/src/assets/images/EduGuidelogo11.png" alt="EduGuide Logo" className="h-10 w-auto rounded-lg shadow-md" />
+          <span className="text-lg font-bold leading-none" style={{ color: C.white }}>EduGuide</span>
+        </a>
+        <span className="text-xs ml-2" style={{ color: 'rgba(255,255,255,0.5)' }}>Grade 11 • Sri Lanka</span>
       </div>
 
       <nav className="flex-1 px-4 py-4 space-y-1">

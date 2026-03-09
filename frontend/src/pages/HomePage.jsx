@@ -148,14 +148,14 @@ const Hero = () => {
             {/* Centered Content Overlay */}
             <div className="relative z-10 w-full max-w-6xl mx-auto text-center">
                 {/* Badge */}
-                <div className="mb-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold border"
+                <div className="inline-flex items-center gap-2 px-4 py-2 mb-4 text-xs font-semibold border rounded-full"
                     style={{ background: `${C.mint}15`, borderColor: `${C.mint}50`, color: C.mint }}>
-                    <Sparkles size={14} />
+                    <Sparkles size={12} />
                     AI-Powered Education Platform for Sri Lanka
                 </div>
 
                 {/* Main Headline - Large and Centered */}
-                <h1 className="px-4 mb-6 text-5xl font-black leading-tight sm:text-6xl md:text-7xl lg:text-8xl"
+                <h1 className="px-4 mb-5 text-4xl font-black leading-tight sm:text-5xl md:text-6xl lg:text-7xl"
                     style={{ color: C.white, textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
                     EMPOWERING{' '}
                     <span style={{ color: C.mint }}>O/L STUDENTS</span>
@@ -163,7 +163,7 @@ const Hero = () => {
                     WITH AI
                 </h1>
 
-                <p className="max-w-3xl px-4 mx-auto mb-10 text-lg leading-relaxed sm:text-xl" 
+                <p className="max-w-3xl px-4 mx-auto mb-8 text-base leading-relaxed sm:text-lg" 
                     style={{ color: C.mintLight, textShadow: '0 2px 10px rgba(0,0,0,0.7)' }}>
                     Advanced AI-driven platform for academic risk prediction, attendance analysis, 
                     personalized learning paths, and student stress monitoring
@@ -378,7 +378,7 @@ const CTABanner = () => {
 
 // ── Footer ────────────────────────────────────────────────────────────────
 const Footer = () => (
-    <footer className="px-8 py-12" style={{ background: `#1a1a2e`, borderTop: `2px solid ${C.mint}44` }}>
+    <footer className="px-8 py-12" style={{ background: `#000000`, borderTop: `2px solid ${C.mint}44` }}>
         <div className="grid max-w-6xl grid-cols-1 gap-10 mx-auto md:grid-cols-3">
             {/* Brand column */}
             <div className="flex flex-col gap-3">

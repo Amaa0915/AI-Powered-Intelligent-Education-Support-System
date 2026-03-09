@@ -180,7 +180,7 @@ const AddStudent = () => {
     };
 
     return (
-        <Layout title="Student Registration" searchId={searchId} setSearchId={setSearchId} handleSearch={handleSearch}>
+        <Layout title="Student Learning Path & Resources suggestion" searchId={searchId} setSearchId={setSearchId} handleSearch={handleSearch}>
 
             {/* ══════════════════════════════════════════
                 Profile / History Modal
@@ -370,7 +370,7 @@ const AddStudent = () => {
                             <UserPlus size={20} className="text-white" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold tracking-tight text-slate-900">Student Registration</h1>
+                            <h1 className="text-xl font-bold tracking-tight text-slate-900">Student Learning Path & Resources suggestion</h1>
                             <p className="text-xs text-slate-400 mt-0.5">Complete all fields to generate an AI-powered personalised learning path</p>
                         </div>
                     </div>

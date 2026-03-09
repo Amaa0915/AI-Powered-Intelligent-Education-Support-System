@@ -151,13 +151,11 @@ export default function AdminDashboard() {
             <aside className="fixed inset-y-0 left-0 w-60 flex flex-col z-20 border-r"
                 style={{ background: 'rgba(15,23,42,0.95)', borderColor: 'rgba(255,255,255,0.06)' }}>
                 <div className="flex items-center gap-2.5 p-5 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg">
-                        <Shield size={14} className="text-white" />
-                    </div>
-                    <div>
-                        <p className="text-white font-bold text-sm leading-none">Admin Panel</p>
-                        <p className="text-slate-500 text-[10px] mt-0.5">EduGuide</p>
-                    </div>
+                    <a href="/" className="flex items-center gap-2">
+                        <img src="/src/assets/images/EduGuidelogo11.png" alt="EduGuide Logo" className="h-8 w-auto rounded-xl shadow-lg" />
+                        <span className="text-white font-bold text-sm leading-none">Admin Panel</span>
+                    </a>
+                    <span className="text-slate-500 text-[10px] mt-0.5 ml-2">EduGuide</span>
                 </div>
 
                 <nav className="flex-1 px-3 pt-4 space-y-1">
