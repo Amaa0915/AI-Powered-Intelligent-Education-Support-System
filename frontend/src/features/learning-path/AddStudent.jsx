@@ -7,14 +7,14 @@ import { getUser } from '../../services/authService';
 
 /* ── Subject config ─────────────────────────────────────── */
 const SUBJECTS = [
-    { name: 'Sinhala',     emoji: '✍️' },
-    { name: 'Mathematics', emoji: '📐' },
-    { name: 'Science',     emoji: '🔬' },
-    { name: 'English',     emoji: '📖' },
-    { name: 'History',     emoji: '🏛️' },
-    { name: 'Buddhism',    emoji: '☸️' },
-    { name: 'Geography',   emoji: '🌍' },
-    { name: 'ICT',         emoji: '💻' },
+    { name: 'Sinhala'},
+    { name: 'Mathematics'},
+    { name: 'Science'},
+    { name: 'English'},
+    { name: 'History'},
+    { name: 'Buddhism'},
+    { name: 'Geography'},
+    { name: 'ICT'},
 ];
 
 /* Prevent -, e, + keys in number inputs */
