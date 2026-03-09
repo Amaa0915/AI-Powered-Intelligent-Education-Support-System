@@ -8,11 +8,11 @@ import { Users, TrendingUp, AlertTriangle, UserX, Calendar, Activity, BarChart2 
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const RISK_COLORS = { critical: '#ef4444', high: '#f97316', medium: '#eab308', low: '#22c55e' };
-const CHART_COLORS = ['#3b82f6', '#8b5cf6', '#06b6d4', '#22c55e', '#f59e0b', '#ef4444'];
+const CHART_COLORS = ['#272343', '#8b5cf6', '#06b6d4', '#22c55e', '#f59e0b', '#ef4444'];
 
 function StatCard({ icon: Icon, label, value, sub, color = 'blue', loading }) {
     const colorMap = {
-        blue: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+        blue: 'text-[#272343] bg-[#E3F6F5] border-[#BAE8E8]',
         red: 'text-red-400 bg-red-500/10 border-red-500/20',
         orange: 'text-orange-400 bg-orange-500/10 border-orange-500/20',
         green: 'text-green-400 bg-green-500/10 border-green-500/20',
@@ -99,7 +99,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {/* Monthly Attendance Trend */}
                 <div className="card">
-                    <h3 className="text-white font-semibold mb-1 flex items-center gap-2"><TrendingUp className="w-4 h-4 text-blue-400" />Monthly Attendance Trend</h3>
+                    <h3 className="text-white font-semibold mb-1 flex items-center gap-2"><TrendingUp className="w-4 h-4 text-[#272343]" />Monthly Attendance Trend</h3>
                     <p className="text-slate-500 text-xs mb-4">Overall attendance rate over time</p>
                     {loading ? (
                         <div className="h-64 rounded-xl bg-slate-700/40 shimmer" />
@@ -110,15 +110,15 @@ export default function Dashboard() {
                             <AreaChart data={monthlyData}>
                                 <defs>
                                     <linearGradient id="rateGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                        <stop offset="5%" stopColor="#272343" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#272343" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                                 <XAxis dataKey="name" tick={{ fill: '#94a3b8', fontSize: 10 }} tickLine={false} interval="preserveStartEnd" />
                                 <YAxis domain={[70, 100]} tick={{ fill: '#94a3b8', fontSize: 10 }} tickLine={false} unit="%" />
                                 <Tooltip content={<CustomTooltip />} />
-                                <Area type="monotone" dataKey="rate" name="Attendance Rate" stroke="#3b82f6" fill="url(#rateGrad)" strokeWidth={2} dot={false} />
+                                <Area type="monotone" dataKey="rate" name="Attendance Rate" stroke="#272343" fill="url(#rateGrad)" strokeWidth={2} dot={false} />
                             </AreaChart>
                         </ResponsiveContainer>
                     )}

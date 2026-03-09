@@ -19,13 +19,13 @@ import { Area, AreaChart, ComposedChart, ReferenceLine } from 'recharts';
 // ─── Shared Helpers ───────────────────────────────────────────────────────────
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const WEATHER_COLORS = {
-    sunny: '#f59e0b', cloudy: '#94a3b8', rainy: '#3b82f6',
-    windy: '#06b6d4', Sunny: '#f59e0b', Cloudy: '#94a3b8', Rainy: '#3b82f6',
+    sunny: '#f59e0b', cloudy: '#94a3b8', rainy: '#272343',
+    windy: '#06b6d4', Sunny: '#f59e0b', Cloudy: '#94a3b8', Rainy: '#272343',
     Stormy: '#6366f1', Foggy: '#64748b', Windy: '#06b6d4', Unknown: '#475569'
 };
 const DISTANCE_COLORS = { Nearby: '#22c55e', Moderate: '#eab308', Far: '#f97316', 'Very Far': '#ef4444' };
-const EVENT_COLORS = ['#8b5cf6', '#ec4899', '#f97316', '#22c55e', '#06b6d4', '#eab308', '#3b82f6', '#ef4444', '#10b981', '#f43f5e', '#a78bfa', '#fb923c', '#34d399'];
-const CHART_COLORS = ['#3b82f6', '#8b5cf6', '#06b6d4', '#22c55e', '#f59e0b', '#ef4444', '#ec4899'];
+const EVENT_COLORS = ['#8b5cf6', '#ec4899', '#f97316', '#22c55e', '#06b6d4', '#eab308', '#272343', '#ef4444', '#272343', '#f43f5e', '#a78bfa', '#fb923c', '#34d399'];
+const CHART_COLORS = ['#272343', '#8b5cf6', '#06b6d4', '#22c55e', '#f59e0b', '#ef4444', '#ec4899'];
 const DISTANCE_BANDS = ['Nearby', 'Moderate', 'Far', 'Very Far'];
 
 const CT = ({ active, payload, label }) => {
@@ -94,7 +94,7 @@ function GlobalImpact({ data, loading }) {
                             <Tooltip content={<CT />} />
                             <Bar dataKey="rate" name="Attendance Rate" radius={[6, 6, 0, 0]} maxBarSize={50}>
                                 {(data.weather_impact || []).map((d, i) => (
-                                    <Cell key={i} fill={WEATHER_COLORS[d.condition] || '#3b82f6'} />
+                                    <Cell key={i} fill={WEATHER_COLORS[d.condition] || '#272343'} />
                                 ))}
                             </Bar>
                         </BarChart>
@@ -144,7 +144,7 @@ function GlobalImpact({ data, loading }) {
                 </div>
                 <div className="card">
                     <h4 className="text-white font-medium mb-1 flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-blue-400" />Monthly Attendance Trend
+                        <TrendingUp className="w-4 h-4 text-[#272343]" />Monthly Attendance Trend
                     </h4>
                     <p className="text-slate-500 text-xs mb-4">Overall attendance rate by month of year</p>
                     <ResponsiveContainer width="100%" height={210}>
@@ -153,7 +153,7 @@ function GlobalImpact({ data, loading }) {
                             <XAxis dataKey="month" tick={{ fill: '#94a3b8', fontSize: 10 }} tickLine={false} />
                             <YAxis domain={[75, 100]} tick={{ fill: '#94a3b8', fontSize: 10 }} unit="%" tickLine={false} />
                             <Tooltip content={<CT />} />
-                            <Line type="monotone" dataKey="rate" name="Attendance Rate" stroke="#3b82f6" strokeWidth={2.5} dot={{ r: 3, fill: '#3b82f6' }} />
+                            <Line type="monotone" dataKey="rate" name="Attendance Rate" stroke="#272343" strokeWidth={2.5} dot={{ r: 3, fill: '#272343' }} />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
@@ -190,7 +190,7 @@ function GlobalImpact({ data, loading }) {
                             <Tooltip content={<CT />} />
                             <Bar dataKey="rate" name="Attendance Rate" radius={[6, 6, 0, 0]} maxBarSize={70}>
                                 {(data.distance_impact).map((d, i) => (
-                                    <Cell key={i} fill={DISTANCE_COLORS[d.band] || '#3b82f6'} />
+                                    <Cell key={i} fill={DISTANCE_COLORS[d.band] || '#272343'} />
                                 ))}
                             </Bar>
                         </BarChart>
@@ -272,7 +272,7 @@ function StudentImpact() {
             {/* Search */}
             <div className="card space-y-3">
                 <h4 className="text-white font-semibold flex items-center gap-2">
-                    <Search className="w-4 h-4 text-blue-400" />Student Attendance Lookup
+                    <Search className="w-4 h-4 text-[#272343]" />Student Attendance Lookup
                 </h4>
                 <p className="text-slate-400 text-xs">
                     Enter a student ID (STU0001 – STU0100). Once loaded, <strong className="text-slate-300">click any bar</strong> in the charts below to instantly see the attendance rate for that specific day / weather / event.
@@ -291,7 +291,7 @@ function StudentImpact() {
             </div>
 
             {err && <div className="rounded-xl bg-red-500/10 border border-red-500/30 p-4 text-sm text-red-300">❌ {err}</div>}
-            {loading && <div className="card flex items-center justify-center h-44"><Loader className="w-6 h-6 animate-spin text-blue-400" /></div>}
+            {loading && <div className="card flex items-center justify-center h-44"><Loader className="w-6 h-6 animate-spin text-[#272343]" /></div>}
 
             {baseData && !loading && (
                 <div className="space-y-4">
@@ -302,7 +302,7 @@ function StudentImpact() {
                             📌 {filterLoading ? '⏳ Calculating…' : filterLabel}
                             {activeFilter.type && !filterLoading && (
                                 <button onClick={() => { setActiveFilter({ type: null, value: null }); setFilterData(null); }}
-                                    className="text-blue-400 hover:text-white text-xs underline ml-1">[clear]</button>
+                                    className="text-[#272343] hover:text-white text-xs underline ml-1">[clear]</button>
                             )}
                         </p>
                         <p className="text-8xl font-black my-3" style={{ color: filterLoading ? '#64748b' : rateColor }}>
@@ -380,7 +380,7 @@ function StudentImpact() {
                                         onClick={d => applyFilter('weather_condition', d.condition)}>
                                         {weatherData.map((d, i) => (
                                             <Cell key={i}
-                                                fill={activeFilter.type === 'weather_condition' && activeFilter.value === d.condition ? '#06b6d4' : (WEATHER_COLORS[d.condition] || '#3b82f6')}
+                                                fill={activeFilter.type === 'weather_condition' && activeFilter.value === d.condition ? '#06b6d4' : (WEATHER_COLORS[d.condition] || '#272343')}
                                                 opacity={activeFilter.type === 'weather_condition' && activeFilter.value !== d.condition ? 0.35 : 1} />
                                         ))}
                                     </Bar>
@@ -419,7 +419,7 @@ function StudentImpact() {
                     {monthData.length > 0 && (
                         <div className="card">
                             <h5 className="text-white text-sm font-medium mb-0.5 flex items-center gap-2">
-                                <TrendingUp className="w-3.5 h-3.5 text-blue-400" />Monthly Attendance Trend (2023–2025)
+                                <TrendingUp className="w-3.5 h-3.5 text-[#272343]" />Monthly Attendance Trend (2023–2025)
                             </h5>
                             <p className="text-slate-500 text-xs mb-3">Overall attendance rate for every month</p>
                             <ResponsiveContainer width="100%" height={160}>
@@ -471,14 +471,14 @@ function PredictionForm() {
 
     return (
         <div className="space-y-6">
-            <div className="flex gap-2">
+            {/* <div className="flex gap-2">
                 {['global', 'student'].map(m => (
                     <button key={m} onClick={() => { setMode(m); setResult(null); }}
-                        className={`px-5 py-2 rounded-xl text-sm font-medium transition-all ${mode === m ? 'bg-blue-600 text-white' : 'bg-slate-700/50 text-slate-400 hover:text-white'}`}>
+                        className={`px-5 py-2 rounded-xl text-sm font-medium transition-all ${mode === m ? 'bg-[#272343] text-white' : 'bg-slate-700/50 text-slate-400 hover:text-white'}`}>
                         {m === 'global' ? '🏫 All Students' : '👤 Single Student'}
                     </button>
                 ))}
-            </div>
+            </div> */}
 
             <div className="card grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {mode === 'student' && (
@@ -536,7 +536,7 @@ function PredictionForm() {
                     <input type="range" min={0.5} max={25} step={0.5} value={form.distance_km}
                         onChange={e => update('distance_km', parseFloat(e.target.value))}
                         className="w-full h-2 rounded-lg appearance-none cursor-pointer"
-                        style={{ accentColor: '#10b981' }} />
+                        style={{ accentColor: '#272343' }} />
                     <div className="flex justify-between text-[10px] text-slate-500 mt-1">
                         <span>0.5 km</span><span>6.75</span><span>13</span><span>19.25</span><span>25 km</span>
                     </div>
@@ -545,7 +545,7 @@ function PredictionForm() {
                 <div className="flex items-end">
                     <label className="flex items-center gap-3 cursor-pointer group w-full">
                         <input type="checkbox" checked={form.is_holiday} onChange={e => update('is_holiday', e.target.checked)}
-                            className="w-4 h-4 rounded accent-blue-500" />
+                            className="w-4 h-4 rounded accent-[#272343]" />
                         <span className="text-sm text-slate-300 group-hover:text-white transition-colors">Academic Holiday</span>
                     </label>
                 </div>
@@ -563,7 +563,7 @@ function PredictionForm() {
 
             {result && !loading && (
                 <div className="space-y-5">
-                    <div className="card text-center py-8 glow-blue" style={{ border: `1px solid ${rateColor}40` }}>
+                    <div className="card text-center py-8 glow-navy" style={{ border: `1px solid ${rateColor}40` }}>
                         <p className="text-slate-400 text-sm mb-2">{mode === 'global' ? 'Predicted School-Wide Attendance' : `Predicted Attendance for ${result.student_id || form.student_id}`}</p>
                         <p className="text-7xl font-black mb-2" style={{ color: rateColor }}>{rate?.toFixed(1)}%</p>
                         {result.historical_rate && (
@@ -590,7 +590,7 @@ function PredictionForm() {
                                         <YAxis domain={[60, 100]} unit="%" tick={{ fill: '#94a3b8', fontSize: 9 }} tickLine={false} />
                                         <Tooltip content={<CT />} />
                                         <Bar dataKey="predicted_rate" name="Predicted Rate" radius={[4, 4, 0, 0]}>
-                                            {result.weather_comparison.map((d, i) => <Cell key={i} fill={WEATHER_COLORS[d.condition] || '#3b82f6'} />)}
+                                            {result.weather_comparison.map((d, i) => <Cell key={i} fill={WEATHER_COLORS[d.condition] || '#272343'} />)}
                                         </Bar>
                                     </BarChart>
                                 </ResponsiveContainer>
@@ -627,7 +627,7 @@ function PredictionForm() {
                                     <YAxis domain={[60, 100]} unit="%" tick={{ fill: '#94a3b8', fontSize: 9 }} tickLine={false} />
                                     <Tooltip content={<CT />} />
                                     <Bar dataKey="predicted_rate" name="Predicted Rate" radius={[6, 6, 0, 0]} maxBarSize={70}>
-                                        {result.distance_comparison.map((d, i) => <Cell key={i} fill={DISTANCE_COLORS[d.band] || '#3b82f6'} />)}
+                                        {result.distance_comparison.map((d, i) => <Cell key={i} fill={DISTANCE_COLORS[d.band] || '#272343'} />)}
                                     </Bar>
                                 </BarChart>
                             </ResponsiveContainer>
@@ -647,7 +647,7 @@ function PredictionForm() {
                                         <YAxis domain={[50, 100]} unit="%" tick={{ fill: '#94a3b8', fontSize: 9 }} tickLine={false} />
                                         <Tooltip content={<CT />} />
                                         <Bar dataKey="predicted_rate" name="Predicted Rate" radius={[4, 4, 0, 0]}>
-                                            {result.weather_scan.map((d, i) => <Cell key={i} fill={WEATHER_COLORS[d.condition] || '#3b82f6'} />)}
+                                            {result.weather_scan.map((d, i) => <Cell key={i} fill={WEATHER_COLORS[d.condition] || '#272343'} />)}
                                         </Bar>
                                     </BarChart>
                                 </ResponsiveContainer>
@@ -690,7 +690,7 @@ function PredictionForm() {
                                     <YAxis domain={[50, 100]} unit="%" tick={{ fill: '#94a3b8', fontSize: 9 }} tickLine={false} />
                                     <Tooltip content={<CT />} />
                                     <Bar dataKey="predicted_rate" name="Predicted Rate" radius={[6, 6, 0, 0]} maxBarSize={70}>
-                                        {result.distance_scan.map((d, i) => <Cell key={i} fill={DISTANCE_COLORS[d.band] || '#3b82f6'} />)}
+                                        {result.distance_scan.map((d, i) => <Cell key={i} fill={DISTANCE_COLORS[d.band] || '#272343'} />)}
                                     </Bar>
                                 </BarChart>
                             </ResponsiveContainer>
@@ -725,7 +725,7 @@ function PredictionForm() {
                                     <div key={i} className="flex items-center gap-3">
                                         <span className="text-slate-400 text-xs w-36 truncate flex-shrink-0">{f.feature.replace('weather_', '').replace('event_', '')}</span>
                                         <div className="flex-1 bg-slate-700 rounded-full h-2">
-                                            <div className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all"
+                                            <div className="h-2 rounded-full bg-gradient-to-r from-[#272343] to-purple-500 transition-all"
                                                 style={{ width: `${(f.importance / result.feature_importance[0].importance) * 100}%` }} />
                                         </div>
                                         <span className="text-slate-300 text-xs w-14 text-right font-mono">{(f.importance * 100).toFixed(2)}%</span>
@@ -744,7 +744,7 @@ function PredictionForm() {
 const WEATHER_OPTS = ['sunny', 'cloudy', 'rainy', 'windy', 'stormy', 'foggy'];
 const EVENT_OPTS = ['normal', 'exam', 'term_start', 'term_end', 'sports_meet', 'before_sports', 'after_sports', 'prize_giving', 'teachers_day', 'childrens_day', 'sil_camp'];
 const SEV_STYLES = {
-    green: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', text: 'text-emerald-300', badge: 'bg-emerald-500/20 text-emerald-300' },
+    green: { bg: 'bg-[#E3F6F5]', border: 'border-[#272343]/30', text: 'text-emerald-300', badge: 'bg-emerald-500/20 text-emerald-300' },
     yellow: { bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', text: 'text-yellow-300', badge: 'bg-yellow-500/20 text-yellow-300' },
     orange: { bg: 'bg-orange-500/10', border: 'border-orange-500/30', text: 'text-orange-300', badge: 'bg-orange-500/20 text-orange-300' },
     red: { bg: 'bg-red-500/10', border: 'border-red-500/30', text: 'text-red-300', badge: 'bg-red-500/20 text-red-300' },
@@ -821,7 +821,7 @@ function GuestTrendAnalyzer({ onClose }) {
                         <p className="text-slate-400 text-xs mt-0.5">Context-aware ARIMA forecast for new students — no database required</p>
                     </div>
                     <div className="flex items-center gap-3">
-                        {step === 2 && <button onClick={() => setStep(1)} className="text-xs text-blue-400 hover:text-white px-3 py-1.5 rounded-lg bg-slate-800 transition">← Edit Inputs</button>}
+                        {step === 2 && <button onClick={() => setStep(1)} className="text-xs text-[#272343] hover:text-white px-3 py-1.5 rounded-lg bg-slate-800 transition">← Edit Inputs</button>}
                         <button onClick={onClose} className="p-2 rounded-xl hover:bg-slate-700 transition text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
                     </div>
                 </div>
@@ -840,9 +840,9 @@ function GuestTrendAnalyzer({ onClose }) {
                             {/* Section 1: Attendance Grid */}
                             <div className="card space-y-3">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-white font-semibold flex items-center gap-2"><Activity className="w-4 h-4 text-blue-400" />Last 30 Days Attendance</h3>
+                                    <h3 className="text-white font-semibold flex items-center gap-2"><Activity className="w-4 h-4 text-[#272343]" />Last 30 Days Attendance</h3>
                                     <div className="flex gap-2">
-                                        <button onClick={() => fillAll(1)} className="text-xs px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition">All Present</button>
+                                        <button onClick={() => fillAll(1)} className="text-xs px-3 py-1 rounded-lg bg-[#E3F6F5] text-emerald-400 hover:bg-emerald-500/20 transition">All Present</button>
                                         <button onClick={() => fillAll(0)} className="text-xs px-3 py-1 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition">All Absent</button>
                                     </div>
                                 </div>
@@ -851,7 +851,7 @@ function GuestTrendAnalyzer({ onClose }) {
                                     {attendance.map((v, i) => (
                                         <button key={i} onClick={() => toggleDay(i)}
                                             title={`Day ${i + 1}: ${v ? 'Present' : 'Absent'}`}
-                                            className={`aspect-square rounded-lg text-xs font-bold transition-all border ${v ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/30'
+                                            className={`aspect-square rounded-lg text-xs font-bold transition-all border ${v ? 'bg-emerald-500/20 border-[#272343]/40 text-emerald-400 hover:bg-emerald-500/30'
                                                     : 'bg-red-500/10 border-red-500/30 text-red-500 hover:bg-red-500/20'
                                                 }`}>{i + 1}</button>
                                     ))}
@@ -886,7 +886,7 @@ function GuestTrendAnalyzer({ onClose }) {
                                         </label>
                                         <input type="range" min={0.5} max={25} step={0.5} value={distKm}
                                             onChange={e => setDistKm(parseFloat(e.target.value))}
-                                            className="w-full h-2 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#10b981' }} />
+                                            className="w-full h-2 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#272343' }} />
                                         <div className="flex justify-between text-[10px] text-slate-500 mt-0.5"><span>0.5km</span><span>6.75</span><span>13</span><span>19.25</span><span>25km</span></div>
                                     </div>
                                 </div>
@@ -917,7 +917,7 @@ function GuestTrendAnalyzer({ onClose }) {
                                                 {EVENT_OPTS.map(o => <option key={o}>{o}</option>)}
                                             </select>
                                             <label className="flex items-center gap-1.5 text-xs text-slate-400 cursor-pointer whitespace-nowrap">
-                                                <input type="checkbox" checked={ev.is_holiday} onChange={e => updateEvt(i, 'is_holiday', e.target.checked)} className="accent-blue-500" />
+                                                <input type="checkbox" checked={ev.is_holiday} onChange={e => updateEvt(i, 'is_holiday', e.target.checked)} className="accent-[#272343]" />
                                                 Holiday
                                             </label>
                                             <button onClick={() => removeEvt(i)} className="p-1 text-slate-500 hover:text-red-400 transition"><X className="w-3.5 h-3.5" /></button>
@@ -955,10 +955,10 @@ function GuestTrendAnalyzer({ onClose }) {
                             {/* Combined chart */}
                             <div className="card">
                                 <h4 className="text-white font-medium mb-1 flex items-center gap-2">
-                                    <BarChart2 className="w-4 h-4 text-blue-400" />Attendance Timeline
+                                    <BarChart2 className="w-4 h-4 text-[#272343]" />Attendance Timeline
                                 </h4>
                                 <p className="text-slate-500 text-xs mb-4">
-                                    <span className="inline-block w-3 h-0.5 bg-blue-400 mr-1 align-middle"></span>Historical weekly rate &nbsp;
+                                    <span className="inline-block w-3 h-0.5 bg-[#272343] mr-1 align-middle"></span>Historical weekly rate &nbsp;
                                     <span className="inline-block w-3 h-0.5 bg-purple-400 mr-1 align-middle" style={{ borderTop: '2px dashed #a78bfa' }}></span>ARIMA forecast &nbsp;
                                     <span className="inline-block w-3 h-2 align-middle rounded" style={{ background: 'rgba(139,92,246,0.15)' }}></span> Confidence band
                                 </p>
@@ -970,7 +970,7 @@ function GuestTrendAnalyzer({ onClose }) {
                                         <Tooltip content={<CT />} />
                                         <Area dataKey="hi" stroke="none" fill="#8b5cf620" name="CI Upper" legendType="none" />
                                         <Area dataKey="lo" stroke="none" fill="#8b5cf600" name="CI Lower" legendType="none" />
-                                        <Line type="monotone" dataKey="historical" stroke="#3b82f6" strokeWidth={2.5} dot={{ r: 3, fill: '#3b82f6' }} name="Historical" connectNulls />
+                                        <Line type="monotone" dataKey="historical" stroke="#272343" strokeWidth={2.5} dot={{ r: 3, fill: '#272343' }} name="Historical" connectNulls />
                                         <Line type="monotone" dataKey="adjusted" stroke="#a78bfa" strokeWidth={2} strokeDasharray="6 3" dot={{ r: 2, fill: '#a78bfa' }} name="Forecast (adjusted)" connectNulls />
                                         <ReferenceLine x={result.historical_weekly?.length > 0 ? result.historical_weekly[result.historical_weekly.length - 1]?.label : undefined}
                                             stroke="#475569" strokeDasharray="4 2" label={{ value: 'Today', fill: '#64748b', fontSize: 9 }} />
@@ -1121,7 +1121,7 @@ export default function ContextualAnalysis() {
                     ))}
                 </div>
                 <div className="ml-auto text-xs text-slate-500">
-                    Model: <span className="text-blue-400">Gradient Boosting Classifier</span>
+                    Model: <span className="text-[#272343]">Gradient Boosting Classifier</span>
                 </div>
             </div>
 
@@ -1129,7 +1129,7 @@ export default function ContextualAnalysis() {
                 {TABS.map(t => (
                     <button key={t.id} onClick={() => setTab(t.id)}
                         className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-xl border-b-2 transition-all ${tab === t.id
-                            ? 'text-white border-blue-500 bg-slate-800/60'
+                            ? 'text-white border-[#272343] bg-slate-800/60'
                             : 'text-slate-400 border-transparent hover:text-slate-200'}`}>
                         <t.icon className="w-4 h-4" />{t.label}
                     </button>
@@ -1141,7 +1141,7 @@ export default function ContextualAnalysis() {
                     ? <div className="rounded-xl bg-red-500/10 border border-red-500/30 p-6 text-center text-red-300 text-sm">
                         <AlertTriangle className="w-7 h-7 mx-auto mb-2 text-red-400" />
                         {impactErr}
-                        <p className="text-slate-500 text-xs mt-2">Start the ML service: <code className="text-blue-400">python ml_service/app.py</code></p>
+                        <p className="text-slate-500 text-xs mt-2">Start the ML service: <code className="text-[#272343]">python ml_service/app.py</code></p>
                     </div>
                     : <GlobalImpact data={impact} loading={impactLoading} />
             )}
@@ -1153,11 +1153,11 @@ export default function ContextualAnalysis() {
                         <div>
                             <div className="flex items-center gap-2 mb-1">
                                 <Sparkles className="w-4 h-4 text-purple-400" />
-                                <span className="text-white font-semibold text-sm">Guest Trend Analyzer</span>
-                                <span className="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full border border-purple-500/30">NEW</span>
+                                <span className="text-[#272343] font-semibold text-sm">Guest Trend Analyzer</span>
+                                <span className="text-[10px] bg-purple-500/20 text-purple-600 px-2 py-0.5 rounded-full border border-purple-500/30">NEW</span>
                             </div>
-                            <p className="text-slate-400 text-xs leading-relaxed">
-                                New student? Enter your last 30 days of attendance and get an ARIMA-powered forecast with <strong className="text-purple-300">context-aware explanations</strong> tied to Sri Lankan school life — holidays, weather, distance & events.
+                            <p className="text-slate-500 text-xs leading-relaxed">
+                                New student? Enter your last 30 days of attendance and get an ARIMA-powered forecast with <strong className="text-purple-600">context-aware explanations</strong> tied to Sri Lankan school life — holidays, weather, distance & events.
                             </p>
                         </div>
                         <button onClick={() => setShowGuestAnalyzer(true)}

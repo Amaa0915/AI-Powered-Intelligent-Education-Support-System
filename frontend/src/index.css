@@ -264,7 +264,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: #2563eb;
+  background: #272343;
   color: #ffffff;
   padding: 0.5rem 1rem;
   border-radius: 0.75rem;
@@ -276,7 +276,7 @@ body {
   font-family: inherit;
 }
 .attendance-section .btn-primary:hover {
-  background: #3b82f6;
+  background: #1e1b33;
 }
 
 /* Table row */

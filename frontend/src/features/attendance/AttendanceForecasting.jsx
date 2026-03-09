@@ -59,7 +59,7 @@ function LSTMChart({ data, loading, error }) {
             <AlertTriangle className="w-8 h-8 text-red-400 mx-auto mb-3" />
             <p className="text-red-300 font-medium mb-1">ML Service Error</p>
             <p className="text-red-400/80 text-sm">{error}</p>
-            <p className="text-slate-500 text-xs mt-3">Make sure the Python ML service is running: <code className="text-blue-400">python ml_service/app.py</code></p>
+            <p className="text-slate-500 text-xs mt-3">Make sure the Python ML service is running: <code className="text-[#272343]">python ml_service/app.py</code></p>
         </div>
     );
 
@@ -88,8 +88,8 @@ function LSTMChart({ data, loading, error }) {
                             <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
                         </linearGradient>
                         <linearGradient id="actualGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
-                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                            <stop offset="5%" stopColor="#272343" stopOpacity={0.2} />
+                            <stop offset="95%" stopColor="#272343" stopOpacity={0} />
                         </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -99,7 +99,7 @@ function LSTMChart({ data, loading, error }) {
                     <Legend wrapperStyle={{ fontSize: 11, color: '#94a3b8' }} />
                     <ReferenceLine x={data?.historical?.[data.historical.length - 1]?.label}
                         stroke="#475569" strokeDasharray="4 2" label={{ value: 'Forecast Start', fill: '#64748b', fontSize: 10 }} />
-                    <Area type="monotone" dataKey="actual" name="Historical Rate" stroke="#3b82f6" fill="url(#actualGrad)" strokeWidth={2} dot={false} connectNulls={false} />
+                    <Area type="monotone" dataKey="actual" name="Historical Rate" stroke="#272343" fill="url(#actualGrad)" strokeWidth={2} dot={false} connectNulls={false} />
                     <Area type="monotone" dataKey="predicted" name="LSTM Predicted" stroke="#8b5cf6" fill="url(#lstmGrad)" strokeWidth={2.5} dot={false} strokeDasharray="5 3" connectNulls={false} />
                 </ComposedChart>
             </ResponsiveContainer>
@@ -167,7 +167,7 @@ function ARIMAChart({ data, loading, error }) {
                     {/* CI band */}
                     <Area type="monotone" dataKey="ci_upper" fill="url(#ciGrad)" stroke="transparent" name="CI Upper (80%)" legendType="none" connectNulls={false} />
                     <Area type="monotone" dataKey="ci_lower" fill="#0f172a" stroke="transparent" name="CI Lower (80%)" legendType="none" connectNulls={false} />
-                    <Line type="monotone" dataKey="actual" name="Historical Rate" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={false} />
+                    <Line type="monotone" dataKey="actual" name="Historical Rate" stroke="#272343" strokeWidth={2} dot={false} connectNulls={false} />
                     <Line type="monotone" dataKey="mean" name="ARIMA Forecast" stroke="#06b6d4" strokeWidth={2.5} dot={{ r: 3, fill: '#06b6d4' }} strokeDasharray="6 3" connectNulls={false} />
                 </ComposedChart>
             </ResponsiveContainer>
@@ -203,7 +203,7 @@ function StudentForecast() {
     return (
         <div className="card space-y-4">
             <h3 className="text-white font-semibold flex items-center gap-2">
-                <Search className="w-4 h-4 text-blue-400" />Per-Student ARIMA Forecast
+                <Search className="w-4 h-4 text-[#272343]" />Per-Student ARIMA Forecast
             </h3>
             <p className="text-slate-500 text-xs">Enter a student ID to forecast their next 6 months of attendance</p>
             <div className="flex gap-2">
@@ -236,7 +236,7 @@ function StudentForecast() {
                             <Legend wrapperStyle={{ fontSize: 11, color: '#94a3b8' }} />
                             <Area type="monotone" dataKey="ci_upper" fill="#8b5cf620" stroke="transparent" legendType="none" connectNulls={false} />
                             <Area type="monotone" dataKey="ci_lower" fill="#0f172a" stroke="transparent" legendType="none" connectNulls={false} />
-                            <Line type="monotone" dataKey="actual" name="Historical" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={false} />
+                            <Line type="monotone" dataKey="actual" name="Historical" stroke="#272343" strokeWidth={2} dot={false} connectNulls={false} />
                             <Line type="monotone" dataKey="mean" name="Forecast" stroke="#a78bfa" strokeWidth={2.5} strokeDasharray="5 3" dot={{ r: 3, fill: '#a78bfa' }} connectNulls={false} />
                         </ComposedChart>
                     </ResponsiveContainer>
@@ -362,7 +362,7 @@ export default function Forecasting() {
                 <div className="flex-1">
                     <p className="text-white font-medium text-sm">Pre-trained LSTM Model Loaded</p>
                     <p className="text-slate-400 text-xs mt-0.5">
-                        <code className="text-blue-400">attendance_lstm_enhanced_model.h5</code> (17MB) — trained on your research dataset
+                        <code className="text-[#272343]">attendance_lstm_enhanced_model.h5</code> (17MB) — trained on your research dataset
                     </p>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center flex-shrink-0">
@@ -379,7 +379,7 @@ export default function Forecasting() {
                 {TABS.map(tab => (
                     <button key={tab.id} onClick={() => setActiveTab(tab.id)}
                         className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-xl border-b-2 transition-all ${activeTab === tab.id
-                            ? 'text-white border-blue-500 bg-slate-800/60'
+                            ? 'text-white border-[#272343] bg-slate-800/60'
                             : 'text-slate-400 border-transparent hover:text-slate-200'}`}>
                         <tab.icon className="w-4 h-4" />
                         {tab.label}

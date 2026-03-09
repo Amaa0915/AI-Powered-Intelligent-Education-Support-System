@@ -10,7 +10,7 @@ const subNav = [
 
 export default function AttendanceLayout() {
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-[#E3F6F5] flex">
       <Sidebar />
       <div className="flex-1 ml-64 flex flex-col">
         <Topbar title="Attendance Trends" />
@@ -25,7 +25,7 @@ export default function AttendanceLayout() {
               className={({ isActive }) =>
                 `flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-all ${
                   isActive
-                    ? 'text-blue-600 border-blue-500'
+                    ? 'text-[#272343] border-[#272343]'
                     : 'text-slate-500 border-transparent hover:text-slate-900 hover:border-slate-300'
                 }`
               }
@@ -37,7 +37,7 @@ export default function AttendanceLayout() {
         </div>
 
         {/* Light-themed content area for attendance pages */}
-        <main className="flex-1 bg-slate-50 attendance-section p-6 overflow-auto">
+        <main className="flex-1 bg-[#E3F6F5] attendance-section p-6 overflow-auto">
           <Outlet />
         </main>
       </div>

@@ -60,7 +60,7 @@ export default function StudentList() {
             <div className="card p-0 overflow-hidden">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700/50">
                     <h3 className="font-semibold text-white flex items-center gap-2">
-                        <Users className="w-4 h-4 text-blue-400" />
+                        <Users className="w-4 h-4 text-[#272343]" />
                         Students
                         {!loading && <span className="text-slate-400 font-normal text-sm">({data.total.toLocaleString()} total)</span>}
                     </h3>

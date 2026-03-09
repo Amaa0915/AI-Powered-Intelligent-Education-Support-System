@@ -206,7 +206,7 @@ const StudentProfile = () => {
                         <div className="flex items-center justify-center w-8 h-8 text-purple-500 rounded-lg bg-purple-50">
                             <LayoutGrid size={18} />
                         </div>
-                        Post-O/L Career Path Matching
+                        Post-A/L Career Path Matching
                     </h3>
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                         {al_stream_recommendations.map((stream, idx) => (

@@ -7,7 +7,7 @@ import {
 import { Cloud, Calendar, Sun, TrendingUp } from 'lucide-react';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const WEATHER_COLORS = { Sunny: '#f59e0b', Cloudy: '#94a3b8', Rainy: '#3b82f6', Stormy: '#6366f1', Foggy: '#64748b', Snowy: '#e2e8f0', Windy: '#06b6d4' };
+const WEATHER_COLORS = { Sunny: '#f59e0b', Cloudy: '#94a3b8', Rainy: '#272343', Stormy: '#6366f1', Foggy: '#64748b', Snowy: '#e2e8f0', Windy: '#06b6d4' };
 
 const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
@@ -71,7 +71,7 @@ export default function AttendanceTrends() {
 
             {/* Year Filter */}
             <div className="flex items-center gap-3">
-                <Calendar className="w-4 h-4 text-blue-400" />
+                <Calendar className="w-4 h-4 text-[#272343]" />
                 <select value={yearFilter} onChange={e => setYearFilter(e.target.value)} className="input-field w-40">
                     <option value="">All Years</option>
                     {years.map(y => <option key={y} value={y}>{y}</option>)}
@@ -82,7 +82,7 @@ export default function AttendanceTrends() {
             {/* Monthly Lines */}
             <div className="card">
                 <h3 className="text-white font-semibold mb-1 flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-blue-400" />Monthly Attendance Details
+                    <TrendingUp className="w-4 h-4 text-[#272343]" />Monthly Attendance Details
                 </h3>
                 <p className="text-slate-500 text-xs mb-4">Present vs absent counts and overall rate</p>
                 {loading ? (
@@ -100,7 +100,7 @@ export default function AttendanceTrends() {
                             <Legend wrapperStyle={{ fontSize: 11, color: '#94a3b8' }} />
                             <Line yAxisId="left" type="monotone" dataKey="present" name="Present" stroke="#22c55e" strokeWidth={1.5} dot={false} />
                             <Line yAxisId="left" type="monotone" dataKey="absent" name="Absent" stroke="#ef4444" strokeWidth={1.5} dot={false} />
-                            <Line yAxisId="right" type="monotone" dataKey="rate" name="Rate %" stroke="#3b82f6" strokeWidth={2.5} dot={false} strokeDasharray="5 2" />
+                            <Line yAxisId="right" type="monotone" dataKey="rate" name="Rate %" stroke="#272343" strokeWidth={2.5} dot={false} strokeDasharray="5 2" />
                         </LineChart>
                     </ResponsiveContainer>
                 )}
@@ -149,7 +149,7 @@ export default function AttendanceTrends() {
                                 <Tooltip content={<CustomTooltip />} />
                                 <Bar dataKey="rate" name="Attendance Rate" radius={[6, 6, 0, 0]}>
                                     {weather.map((d, i) => (
-                                        <Cell key={i} fill={WEATHER_COLORS[d.condition] || '#3b82f6'} />
+                                        <Cell key={i} fill={WEATHER_COLORS[d.condition] || '#272343'} />
                                     ))}
                                 </Bar>
                             </BarChart>
@@ -159,7 +159,7 @@ export default function AttendanceTrends() {
                         <div className="flex flex-wrap gap-2 mt-3">
                             {weather.map(w => (
                                 <span key={w.condition} className="flex items-center gap-1.5 text-xs text-slate-400">
-                                    <Sun className="w-3 h-3" style={{ color: WEATHER_COLORS[w.condition] || '#3b82f6' }} />
+                                    <Sun className="w-3 h-3" style={{ color: WEATHER_COLORS[w.condition] || '#272343' }} />
                                     {w.condition} ({w.rate}%)
                                 </span>
                             ))}
