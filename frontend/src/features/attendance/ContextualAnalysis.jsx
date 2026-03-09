@@ -1079,7 +1079,7 @@ function GuestTrendAnalyzer({ onClose }) {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 const TABS = [
     { id: 'global', label: 'All Students Impact', icon: Activity },
-    { id: 'student', label: 'Student Impact Lookup', icon: Search },
+    /* { id: 'student', label: 'Student Impact Lookup', icon: Search }, hidden by user request */
     { id: 'predict', label: 'Contextual Prediction', icon: Brain },
 ];
 
@@ -1145,7 +1145,7 @@ export default function ContextualAnalysis() {
                     </div>
                     : <GlobalImpact data={impact} loading={impactLoading} />
             )}
-            {tab === 'student' && <StudentImpact />}
+            {tab === 'student' && {/* <StudentImpact /> hidden by user request */}}
             {tab === 'predict' && (
                 <div className="space-y-4">
                     {/* Guest Trend Analyzer CTA */}

@@ -209,10 +209,8 @@ body {
 
 /* Card */
 .attendance-section .card {
-  background: rgba(30, 41, 59, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(71, 85, 105, 0.5);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 1rem;
   padding: 1.5rem;
   transition: all 0.3s ease;
@@ -220,10 +218,8 @@ body {
 
 /* Stat Card (card with hover glow) */
 .attendance-section .stat-card {
-  background: rgba(30, 41, 59, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(71, 85, 105, 0.5);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 1rem;
   padding: 1.5rem;
   transition: all 0.3s ease;
@@ -285,18 +281,18 @@ body {
 
 /* Table row */
 .attendance-section .table-row {
-  border-bottom: 1px solid rgba(71, 85, 105, 0.5);
+  border-bottom: 1px solid var(--border-color);
   transition: background 0.15s ease;
 }
 .attendance-section .table-row:hover {
-  background: rgba(71, 85, 105, 0.3);
+  background: var(--bg-primary);
 }
 
 /* Input field */
 .attendance-section .input-field {
-  background: rgba(71, 85, 105, 0.5);
-  border: 1px solid rgba(100, 116, 139, 0.5);
-  color: #ffffff;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
   border-radius: 0.75rem;
   padding: 0.625rem 1rem;
   font-size: 0.875rem;
@@ -335,7 +331,7 @@ body {
   background: linear-gradient(
     90deg,
     transparent 25%,
-    rgba(255, 255, 255, 0.05) 50%,
+    rgba(0, 0, 0, 0.05) 50%,
     transparent 75%
   );
   background-size: 200% 100%;
