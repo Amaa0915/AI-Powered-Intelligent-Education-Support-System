@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { isAuthenticated, getUser } from '../services/authService';
 import {
@@ -9,7 +9,7 @@ import {
 
 // ── Palette ──────────────────────────────────────────────────────────────
 const C = {
-    navy:      '#272343',
+    navy:      '#0d034c',
     white:     '#FFFFFF',
     mintLight: '#E3F6F5',
     mint:      '#BAE8E8',
@@ -19,6 +19,15 @@ const C = {
 const Navbar = () => {
     const navigate = useNavigate();
     const user = isAuthenticated() ? getUser() : null;
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 50);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const handleDashboard = () => {
         if (!user) return navigate('/login');
@@ -26,23 +35,30 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="fixed top-0 inset-x-0 z-50 flex items-center justify-end px-8 py-4 gap-10"
-            style={{ background: C.navy, borderBottom: `2px solid ${C.mint}` }}>
+        <nav className="fixed inset-x-0 top-0 z-50 flex items-center justify-end gap-10 px-8 py-1 transition-all duration-300"
+            style={{ 
+                background: scrolled 
+                    ? `${C.navy}ee` 
+                    : 'linear-gradient(to bottom, rgba(0,0,0,0.4), transparent)',
+                backdropFilter: scrolled ? 'blur(10px)' : 'none',
+                borderBottom: scrolled ? `1px solid ${C.mint}33` : 'none'
+            }}>
             {/* Logo — far left via mr-auto */}
             <Link to="/" className="flex items-center gap-2.5 mr-auto">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                    style={{ background: C.mint }}>
-                    <BookOpen size={16} style={{ color: C.navy }} />
-                </div>
-                <span className="font-black text-lg tracking-tight" style={{ color: C.white }}>EduGuide</span>
+                <img 
+                    src="/src/assets/images/EduGuidelogo11.png" 
+                    alt="EduGuide Logo" 
+                    className="w-auto h-20 transition-all hover:opacity-90"
+                    style={{ filter: scrolled ? 'none' : 'drop-shadow(0 2px 10px rgba(0,0,0,0.5))' }}
+                />
             </Link>
 
             {/* Nav links — right side */}
-            <div className="hidden md:flex items-center gap-7 text-sm">
+            <div className="items-center hidden text-sm md:flex gap-7">
                 {['Features', 'How it Works', 'Benefits'].map(s => (
                     <a key={s} href={`#${s.toLowerCase().replace(/ /g, '-')}`}
-                        className="transition-colors hover:opacity-80"
-                        style={{ color: C.mintLight }}>{s}</a>
+                        className="font-medium transition-colors hover:opacity-80"
+                        style={{ color: C.white, textShadow: '0 1px 5px rgba(0,0,0,0.5)' }}>{s}</a>
                 ))}
             </div>
 
@@ -50,20 +66,20 @@ const Navbar = () => {
             <div className="flex items-center gap-3">
                 {user ? (
                     <button onClick={handleDashboard}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:opacity-90"
-                        style={{ background: C.mint, color: C.navy }}>
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-semibold transition-all rounded-xl hover:opacity-90"
+                        style={{ background: C.mint, color: C.navy, boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
                         Dashboard <ArrowRight size={14} />
                     </button>
                 ) : (
                     <>
                         <Link to="/login"
                             className="px-4 py-2 text-sm font-medium transition-opacity hover:opacity-80"
-                            style={{ color: C.mintLight }}>
+                            style={{ color: C.white, textShadow: '0 1px 5px rgba(0,0,0,0.5)' }}>
                             Sign In
                         </Link>
                         <Link to="/register"
-                            className="px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:opacity-90"
-                            style={{ background: C.mint, color: C.navy }}>
+                            className="px-4 py-2 text-sm font-semibold transition-all rounded-xl hover:opacity-90"
+                            style={{ background: C.mint, color: C.navy, boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
                             Get Started
                         </Link>
                     </>
@@ -76,63 +92,116 @@ const Navbar = () => {
 // ── Hero ─────────────────────────────────────────────────────────────────
 const Hero = () => {
     const navigate = useNavigate();
+    const [currentSlide, setCurrentSlide] = useState(0);
+    
+    const heroImages = [
+        '/src/assets/images/picture1.png',
+        '/src/assets/images/picture2.png'
+    ];
+
+    // Auto-slide effect - change image every 5 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
     return (
-        <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 pt-20 overflow-hidden"
-            style={{ background: `linear-gradient(160deg, ${C.navy} 0%, #1a3040 60%, #0d2233 100%)` }}>
-            {/* Background decorations */}
-            <div className="absolute top-1/4 left-0 w-96 h-96 rounded-full opacity-10 blur-3xl pointer-events-none"
-                style={{ background: C.mint }} />
-            <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full opacity-10 blur-3xl pointer-events-none"
-                style={{ background: C.mintLight }} />
-
-            {/* Badge */}
-            <div className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold border"
-                style={{ background: `${C.mint}22`, borderColor: `${C.mint}66`, color: C.mint }}>
-                <Sparkles size={12} />
-                AI-Powered Education Platform for Sri Lanka
-            </div>
-
-            {/* Headline */}
-            <h1 className="text-5xl sm:text-6xl md:text-7xl font-black leading-tight max-w-4xl mb-6"
-                style={{ color: C.white }}>
-                Smart Learning for{' '}
-                <span style={{ color: C.mint }}>O/L Students</span>
-            </h1>
-
-            <p className="text-lg max-w-2xl mb-10 leading-relaxed" style={{ color: C.mintLight }}>
-                EduGuide uses advanced AI to predict academic risk, analyse attendance patterns,
-                generate personalised learning paths, and monitor student stress — helping every
-                Sri Lankan student reach their full potential.
-            </p>
-
-            <div className="flex flex-wrap justify-center gap-4 mb-16">
-                <button onClick={() => navigate('/register')}
-                    className="flex items-center gap-2 px-7 py-3.5 rounded-2xl font-semibold text-base transition-all hover:-translate-y-0.5 hover:opacity-90"
-                    style={{ background: C.mint, color: C.navy, boxShadow: `0 8px 28px ${C.mint}55` }}>
-                    <Sparkles size={18} /> Get Started Free
-                </button>
-                <button onClick={() => navigate('/login')}
-                    className="flex items-center gap-2 px-7 py-3.5 rounded-2xl font-semibold text-base border transition-all hover:opacity-80"
-                    style={{ borderColor: `${C.mint}66`, color: C.mintLight }}>
-                    Student Login <ChevronRight size={18} />
-                </button>
-            </div>
-
-            {/* Stats */}
-            <div className="flex flex-wrap justify-center gap-10">
-                {[
-                    { label: 'Students Supported', value: '10,000+', icon: <Users size={18} /> },
-                    { label: 'Prediction Accuracy', value: '94.7%', icon: <Star size={18} /> },
-                    { label: 'Risk Interventions', value: '2,800+', icon: <TrendingUp size={18} /> },
-                ].map(s => (
-                    <div key={s.label} className="text-center">
-                        <div className="flex items-center justify-center gap-1.5 text-2xl font-black mb-1"
-                            style={{ color: C.mint }}>
-                            {s.icon} {s.value}
-                        </div>
-                        <p className="text-xs" style={{ color: C.mintLight }}>{s.label}</p>
-                    </div>
+        <section className="relative flex items-center justify-center h-screen px-6 pt-16 pb-8 overflow-hidden">
+            {/* Auto-sliding Background Images - Full Width */}
+            <div className="absolute inset-0 z-0">
+                {heroImages.map((img, index) => (
+                    <div
+                        key={index}
+                        className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+                        style={{
+                            opacity: currentSlide === index ? 1 : 0,
+                            backgroundImage: `url(${img})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            backgroundRepeat: 'no-repeat'
+                        }}
+                    />
                 ))}
+                {/* Dark overlay for better text readability */}
+                <div className="absolute inset-0" 
+                    style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.75), rgba(0,0,0,0.5), rgba(0,0,0,0.75))' }} />
+            </div>
+
+            {/* Slide indicators */}
+            <div className="absolute z-20 flex gap-2 transform -translate-x-1/2 bottom-8 left-1/2">
+                {heroImages.map((_, index) => (
+                    <button
+                        key={index}
+                        onClick={() => setCurrentSlide(index)}
+                        className="w-2 h-2 transition-all duration-300 rounded-full"
+                        style={{
+                            background: currentSlide === index ? C.mint : `${C.mint}40`,
+                            width: currentSlide === index ? '32px' : '8px'
+                        }}
+                        aria-label={`Go to slide ${index + 1}`}
+                    />
+                ))}
+            </div>
+
+            {/* Centered Content Overlay */}
+            <div className="relative z-10 w-full max-w-6xl mx-auto text-center">
+                {/* Badge */}
+                <div className="mb-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold border"
+                    style={{ background: `${C.mint}15`, borderColor: `${C.mint}50`, color: C.mint }}>
+                    <Sparkles size={14} />
+                    AI-Powered Education Platform for Sri Lanka
+                </div>
+
+                {/* Main Headline - Large and Centered */}
+                <h1 className="px-4 mb-6 text-5xl font-black leading-tight sm:text-6xl md:text-7xl lg:text-8xl"
+                    style={{ color: C.white, textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
+                    EMPOWERING{' '}
+                    <span style={{ color: C.mint }}>O/L STUDENTS</span>
+                    <br />
+                    WITH AI
+                </h1>
+
+                <p className="max-w-3xl px-4 mx-auto mb-10 text-lg leading-relaxed sm:text-xl" 
+                    style={{ color: C.mintLight, textShadow: '0 2px 10px rgba(0,0,0,0.7)' }}>
+                    Advanced AI-driven platform for academic risk prediction, attendance analysis, 
+                    personalized learning paths, and student stress monitoring
+                </p>
+
+                {/* CTA Buttons */}
+                <div className="flex flex-wrap justify-center gap-4 mb-16">
+                    <button onClick={() => navigate('/register')}
+                        className="flex items-center gap-2 px-8 py-4 text-lg font-bold transition-all rounded-2xl hover:-translate-y-1 hover:shadow-2xl"
+                        style={{ background: C.mint, color: C.navy, boxShadow: `0 10px 40px ${C.mint}66` }}>
+                        <Sparkles size={20} /> Get Started Free
+                    </button>
+                    <button onClick={() => navigate('/login')}
+                        className="flex items-center gap-2 px-8 py-4 text-lg font-bold transition-all border-2 rounded-2xl hover:bg-white/10"
+                        style={{ borderColor: C.mint, color: C.white }}>
+                        Student Login <ChevronRight size={20} />
+                    </button>
+                </div>
+
+                {/* Stats Row */}
+                <div className="flex flex-wrap justify-center gap-12 lg:gap-16">
+                    {[
+                        { label: 'Students Supported', value: '10,000+', icon: <Users size={22} /> },
+                        { label: 'AI Accuracy Rate', value: '94.7%', icon: <Star size={22} /> },
+                        { label: 'Successful Interventions', value: '2,800+', icon: <TrendingUp size={22} /> },
+                    ].map(s => (
+                        <div key={s.label} className="text-center">
+                            <div className="flex items-center justify-center gap-2 mb-2 text-3xl font-black sm:text-4xl"
+                                style={{ color: C.mint, textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
+                                {s.icon} {s.value}
+                            </div>
+                            <p className="text-sm font-medium" 
+                                style={{ color: C.mintLight, textShadow: '0 1px 5px rgba(0,0,0,0.7)' }}>
+                                {s.label}
+                            </p>
+                        </div>
+                    ))}
+                </div>
             </div>
         </section>
     );
@@ -167,27 +236,27 @@ const FEATURES = [
 ];
 
 const Features = () => (
-    <section id="features" className="py-24 px-6" style={{ background: C.mintLight }}>
+    <section id="features" className="px-6 py-24" style={{ background: C.mintLight }}>
         <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-                <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: C.navy }}>Capabilities</p>
-                <h2 className="text-4xl md:text-5xl font-black mb-4" style={{ color: C.navy }}>
+            <div className="mb-16 text-center">
+                <p className="mb-3 text-sm font-semibold tracking-widest uppercase" style={{ color: C.navy }}>Capabilities</p>
+                <h2 className="mb-4 text-4xl font-black md:text-5xl" style={{ color: C.navy }}>
                     Everything a student needs to succeed
                 </h2>
-                <p className="text-lg max-w-2xl mx-auto" style={{ color: '#4a6572' }}>
+                <p className="max-w-2xl mx-auto text-lg" style={{ color: '#4a6572' }}>
                     Four AI engines working in harmony to give teachers and students an unfair advantage.
                 </p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {FEATURES.map((f, i) => (
-                    <div key={i} className="group rounded-2xl p-6 border-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                    <div key={i} className="p-6 transition-all duration-300 border-2 group rounded-2xl hover:-translate-y-1 hover:shadow-xl"
                         style={{ background: C.white, borderColor: C.mint }}>
-                        <div className="w-12 h-12 rounded-xl mb-4 flex items-center justify-center"
+                        <div className="flex items-center justify-center w-12 h-12 mb-4 rounded-xl"
                             style={{ background: C.mint, color: C.navy }}>
                             {f.icon}
                         </div>
-                        <h3 className="font-bold mb-2 text-base" style={{ color: C.navy }}>{f.title}</h3>
+                        <h3 className="mb-2 text-base font-bold" style={{ color: C.navy }}>{f.title}</h3>
                         <p className="text-sm leading-relaxed" style={{ color: '#4a6572' }}>{f.desc}</p>
                     </div>
                 ))}
@@ -204,22 +273,22 @@ const STEPS = [
 ];
 
 const HowItWorks = () => (
-    <section id="how-it-works" className="py-24 px-6" style={{ background: C.white }}>
+    <section id="how-it-works" className="px-6 py-24" style={{ background: C.white }}>
         <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-16">
-                <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: C.mint.replace('BA','80') }}>Process</p>
-                <h2 className="text-4xl md:text-5xl font-black mb-4" style={{ color: C.navy }}>How EduGuide works</h2>
+            <div className="mb-16 text-center">
+                <p className="mb-3 text-sm font-semibold tracking-widest uppercase" style={{ color: C.mint.replace('BA','80') }}>Process</p>
+                <h2 className="mb-4 text-4xl font-black md:text-5xl" style={{ color: C.navy }}>How EduGuide works</h2>
                 <p className="text-lg" style={{ color: '#4a6572' }}>Three steps from raw data to personalised outcomes.</p>
             </div>
 
             <div className="relative">
                 <div className="hidden md:block absolute top-12 left-[calc(16.5%+24px)] right-[calc(16.5%+24px)] h-0.5"
                     style={{ background: `linear-gradient(to right, ${C.mint}, ${C.navy})` }} />
-                <div className="grid md:grid-cols-3 gap-8">
+                <div className="grid gap-8 md:grid-cols-3">
                     {STEPS.map((s, i) => (
                         <div key={i} className="flex flex-col items-center text-center">
                             <div className="relative mb-6">
-                                <div className="w-14 h-14 rounded-2xl flex items-center justify-center z-10 relative shadow-lg"
+                                <div className="relative z-10 flex items-center justify-center shadow-lg w-14 h-14 rounded-2xl"
                                     style={{ background: C.mint, color: C.navy }}>
                                     {s.icon}
                                 </div>
@@ -228,7 +297,7 @@ const HowItWorks = () => (
                                     {s.n}
                                 </span>
                             </div>
-                            <h3 className="font-bold text-base mb-2" style={{ color: C.navy }}>{s.title}</h3>
+                            <h3 className="mb-2 text-base font-bold" style={{ color: C.navy }}>{s.title}</h3>
                             <p className="text-sm leading-relaxed" style={{ color: '#4a6572' }}>{s.desc}</p>
                         </div>
                     ))}
@@ -249,25 +318,25 @@ const BENEFITS = [
 ];
 
 const Benefits = () => (
-    <section id="benefits" className="py-24 px-6" style={{ background: C.mint }}>
+    <section id="benefits" className="px-6 py-24" style={{ background: C.mint }}>
         <div className="max-w-6xl mx-auto">
             <div className="text-center mb-14">
-                <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: C.navy }}>Why EduGuide</p>
-                <h2 className="text-4xl md:text-5xl font-black mb-4" style={{ color: C.navy }}>Built for Sri Lankan students</h2>
-                <p className="text-lg max-w-2xl mx-auto" style={{ color: '#2a4a55' }}>
+                <p className="mb-3 text-sm font-semibold tracking-widest uppercase" style={{ color: C.navy }}>Why EduGuide</p>
+                <h2 className="mb-4 text-4xl font-black md:text-5xl" style={{ color: C.navy }}>Built for Sri Lankan students</h2>
+                <p className="max-w-2xl mx-auto text-lg" style={{ color: '#2a4a55' }}>
                     Every feature is designed around the realities of GCE O/L preparation.
                 </p>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {BENEFITS.map((b, i) => (
-                    <div key={i} className="flex gap-4 p-5 rounded-2xl border-2 transition-all hover:shadow-lg"
+                    <div key={i} className="flex gap-4 p-5 transition-all border-2 rounded-2xl hover:shadow-lg"
                         style={{ background: C.white, borderColor: `${C.navy}22` }}>
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                        <div className="flex items-center justify-center w-10 h-10 rounded-xl shrink-0"
                             style={{ background: `${C.navy}15`, color: C.navy }}>
                             {b.icon}
                         </div>
                         <div>
-                            <h4 className="font-semibold text-sm mb-1" style={{ color: C.navy }}>{b.title}</h4>
+                            <h4 className="mb-1 text-sm font-semibold" style={{ color: C.navy }}>{b.title}</h4>
                             <p className="text-xs leading-relaxed" style={{ color: '#4a6572' }}>{b.desc}</p>
                         </div>
                     </div>
@@ -281,13 +350,13 @@ const Benefits = () => (
 const CTABanner = () => {
     const navigate = useNavigate();
     return (
-        <section className="py-20 px-6" style={{ background: C.navy }}>
+        <section className="px-6 py-20" style={{ background: C.navy }}>
             <div className="max-w-3xl mx-auto text-center">
-                <h2 className="text-4xl md:text-5xl font-black mb-6" style={{ color: C.white }}>
+                <h2 className="mb-6 text-4xl font-black md:text-5xl" style={{ color: C.white }}>
                     Ready to unlock your{' '}
                     <span style={{ color: C.mint }}>potential?</span>
                 </h2>
-                <p className="text-lg mb-10" style={{ color: C.mintLight }}>
+                <p className="mb-10 text-lg" style={{ color: C.mintLight }}>
                     Join thousands of O/L students already using EduGuide to study smarter.
                 </p>
                 <div className="flex flex-wrap justify-center gap-4">
@@ -297,7 +366,7 @@ const CTABanner = () => {
                         Sign Up Free <ArrowRight size={18} />
                     </button>
                     <button onClick={() => navigate('/login')}
-                        className="flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-base border-2 transition-all hover:opacity-80"
+                        className="flex items-center gap-2 px-8 py-4 text-base font-bold transition-all border-2 rounded-2xl hover:opacity-80"
                         style={{ borderColor: C.mint, color: C.mintLight }}>
                         Student Login
                     </button>
@@ -310,15 +379,15 @@ const CTABanner = () => {
 // ── Footer ────────────────────────────────────────────────────────────────
 const Footer = () => (
     <footer className="px-8 py-12" style={{ background: `#1a1a2e`, borderTop: `2px solid ${C.mint}44` }}>
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div className="grid max-w-6xl grid-cols-1 gap-10 mx-auto md:grid-cols-3">
             {/* Brand column */}
             <div className="flex flex-col gap-3">
                 <Link to="/" className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg flex items-center justify-center"
+                    <div className="flex items-center justify-center rounded-lg w-7 h-7"
                         style={{ background: C.mint }}>
                         <BookOpen size={13} style={{ color: C.navy }} />
                     </div>
-                    <span className="font-bold text-base" style={{ color: C.white }}>EduGuide</span>
+                    <span className="text-base font-bold" style={{ color: C.white }}>EduGuide</span>
                 </Link>
                 <p className="text-xs leading-relaxed" style={{ color: `${C.mintLight}99` }}>
                     AI-powered education support system built for Sri Lanka's students and educators.
@@ -327,7 +396,7 @@ const Footer = () => (
 
             {/* Links column */}
             <div className="flex flex-col gap-3">
-                <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: C.mint }}>Quick Links</p>
+                <p className="mb-1 text-xs font-semibold tracking-widest uppercase" style={{ color: C.mint }}>Quick Links</p>
                 {[
                     { label: 'Features', href: '#features' },
                     { label: 'How it Works', href: '#how-it-works' },
@@ -342,7 +411,7 @@ const Footer = () => (
 
             {/* Contact column */}
             <div className="flex flex-col gap-3">
-                <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: C.mint }}>Contact</p>
+                <p className="mb-1 text-xs font-semibold tracking-widest uppercase" style={{ color: C.mint }}>Contact</p>
                 <a href="mailto:support@eduguide.lk"
                     className="flex items-center gap-2 text-sm transition-opacity hover:opacity-70 w-fit"
                     style={{ color: C.mintLight }}>
@@ -353,7 +422,7 @@ const Footer = () => (
                     style={{ color: C.mintLight }}>
                     <Github size={13} /> GitHub Repository
                 </a>
-                <p className="text-xs mt-2" style={{ color: `${C.mint}99` }}>© 2026 EduGuide. All rights reserved.</p>
+                <p className="mt-2 text-xs" style={{ color: `${C.mint}99` }}>© 2026 EduGuide. All rights reserved.</p>
             </div>
         </div>
     </footer>
