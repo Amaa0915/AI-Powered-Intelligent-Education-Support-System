@@ -1,8 +1,16 @@
 import axios from 'axios';
 import { API_URLS } from './config';
 
+<<<<<<< Updated upstream
 const authApi = axios.create({ baseURL: `${API_URLS.AUTH_BACKEND}/api/auth`, timeout: 15000 });
 const adminApi = axios.create({ baseURL: `${API_URLS.AUTH_BACKEND}/api/admin`, timeout: 15000 });
+=======
+import { API_URLS } from './config';
+
+const BASE = API_URLS.AUTH_BACKEND;
+const authApi = axios.create({ baseURL: `${BASE}/api/auth`, timeout: 15000 });
+const adminApi = axios.create({ baseURL: `${BASE}/api/admin`, timeout: 15000 });
+>>>>>>> Stashed changes
 
 // Attach JWT to every request
 const addToken = (config) => {

@@ -1,8 +1,18 @@
 import axios from 'axios';
 import { API_URLS } from './config';
 
+<<<<<<< Updated upstream
 const api = axios.create({ baseURL: `${API_URLS.ATTENDANCE_BACKEND}/api`, timeout: 30000 });
 const mlApi = axios.create({ baseURL: `${API_URLS.ATTENDANCE_BACKEND}/api`, timeout: 180000 });
+=======
+import { API_URLS } from './config';
+
+// Points to the standalone Attendance Analyzer Express backend on port 5050
+const BASE = API_URLS.ATTENDANCE_BACKEND;
+
+const api = axios.create({ baseURL: `${BASE}/api`, timeout: 30000 });
+const mlApi = axios.create({ baseURL: `${BASE}/api`, timeout: 180000 });
+>>>>>>> Stashed changes
 
 // Analytics
 export const fetchSummary = () => api.get('/analytics/summary').then(r => r.data);
