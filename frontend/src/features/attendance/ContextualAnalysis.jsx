@@ -31,8 +31,8 @@ const DISTANCE_BANDS = ['Nearby', 'Moderate', 'Far', 'Very Far'];
 const CT = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
     return (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-3 shadow-xl text-xs">
-            <p className="text-slate-300 font-semibold mb-1">{label}</p>
+        <div className="p-3 text-xs border shadow-xl bg-slate-800 border-slate-700 rounded-xl">
+            <p className="mb-1 font-semibold text-slate-300">{label}</p>
             {payload.map((p, i) => (
                 <p key={i} style={{ color: p.color || p.fill }} className="flex justify-between gap-4">
                     <span>{p.name}:</span>
@@ -44,7 +44,7 @@ const CT = ({ active, payload, label }) => {
 };
 
 const ChartSkel = ({ h = 200 }) => (
-    <div className="rounded-xl bg-slate-700/40 shimmer flex items-center justify-center" style={{ height: h }}>
+    <div className="flex items-center justify-center rounded-xl bg-slate-700/40 shimmer" style={{ height: h }}>
         <Loader className="w-5 h-5 animate-spin text-slate-500" />
     </div>
 );
@@ -52,10 +52,10 @@ const ChartSkel = ({ h = 200 }) => (
 const RateGauge = ({ value, label, sub }) => {
     const color = value >= 85 ? '#22c55e' : value >= 75 ? '#eab308' : '#ef4444';
     return (
-        <div className="stat-card text-center">
-            <p className="text-slate-400 text-xs mb-2">{label}</p>
+        <div className="text-center stat-card">
+            <p className="mb-2 text-xs text-slate-400">{label}</p>
             <p className="text-4xl font-black" style={{ color }}>{value?.toFixed(1)}%</p>
-            {sub && <p className="text-slate-500 text-xs mt-1">{sub}</p>}
+            {sub && <p className="mt-1 text-xs text-slate-500">{sub}</p>}
         </div>
     );
 };
@@ -63,7 +63,7 @@ const RateGauge = ({ value, label, sub }) => {
 // ─── Global Impact Section ────────────────────────────────────────────────────
 function GlobalImpact({ data, loading }) {
     if (loading) return (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
             {[0, 1, 2, 3].map(i => <div key={i} className="card"><ChartSkel /></div>)}
         </div>
     );
@@ -80,12 +80,12 @@ function GlobalImpact({ data, loading }) {
 
     return (
         <div className="space-y-6">
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
                 <div className="card">
-                    <h4 className="text-white font-medium mb-1 flex items-center gap-2">
+                    <h4 className="flex items-center gap-2 mb-1 font-medium text-white">
                         <Cloud className="w-4 h-4 text-cyan-400" />Weather Impact on All Students
                     </h4>
-                    <p className="text-slate-500 text-xs mb-4">Attendance rate grouped by weather condition</p>
+                    <p className="mb-4 text-xs text-slate-500">Attendance rate grouped by weather condition</p>
                     <ResponsiveContainer width="100%" height={210}>
                         <BarChart data={data.weather_impact || []}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
@@ -101,10 +101,10 @@ function GlobalImpact({ data, loading }) {
                     </ResponsiveContainer>
                 </div>
                 <div className="card">
-                    <h4 className="text-white font-medium mb-1 flex items-center gap-2">
+                    <h4 className="flex items-center gap-2 mb-1 font-medium text-white">
                         <Calendar className="w-4 h-4 text-purple-400" />Holiday vs School Day
                     </h4>
-                    <p className="text-slate-500 text-xs mb-4">How academic holidays affect overall attendance</p>
+                    <p className="mb-4 text-xs text-slate-500">How academic holidays affect overall attendance</p>
                     <ResponsiveContainer width="100%" height={210}>
                         <BarChart data={holidayBar}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
@@ -116,20 +116,20 @@ function GlobalImpact({ data, loading }) {
                             </Bar>
                         </BarChart>
                     </ResponsiveContainer>
-                    <div className="mt-3 flex gap-4 justify-center text-xs text-slate-400">
-                        <span>Drop on holidays: <span className="text-red-400 font-bold">
+                    <div className="flex justify-center gap-4 mt-3 text-xs text-slate-400">
+                        <span>Drop on holidays: <span className="font-bold text-red-400">
                             {(holidayBar[0].rate - holidayBar[1].rate).toFixed(1)}%
                         </span></span>
                     </div>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
                 <div className="card">
-                    <h4 className="text-white font-medium mb-1 flex items-center gap-2">
+                    <h4 className="flex items-center gap-2 mb-1 font-medium text-white">
                         <BookOpen className="w-4 h-4 text-orange-400" />School Event Impact
                     </h4>
-                    <p className="text-slate-500 text-xs mb-4">Attendance rate during each school event</p>
+                    <p className="mb-4 text-xs text-slate-500">Attendance rate during each school event</p>
                     <ResponsiveContainer width="100%" height={210}>
                         <BarChart data={data.event_impact || []} layout="vertical">
                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" horizontal={false} />
@@ -143,10 +143,10 @@ function GlobalImpact({ data, loading }) {
                     </ResponsiveContainer>
                 </div>
                 <div className="card">
-                    <h4 className="text-white font-medium mb-1 flex items-center gap-2">
+                    <h4 className="flex items-center gap-2 mb-1 font-medium text-white">
                         <TrendingUp className="w-4 h-4 text-[#272343]" />Monthly Attendance Trend
                     </h4>
-                    <p className="text-slate-500 text-xs mb-4">Overall attendance rate by month of year</p>
+                    <p className="mb-4 text-xs text-slate-500">Overall attendance rate by month of year</p>
                     <ResponsiveContainer width="100%" height={210}>
                         <LineChart data={monthData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -160,10 +160,10 @@ function GlobalImpact({ data, loading }) {
             </div>
 
             <div className="card">
-                <h4 className="text-white font-medium mb-1 flex items-center gap-2">
+                <h4 className="flex items-center gap-2 mb-1 font-medium text-white">
                     <Activity className="w-4 h-4 text-green-400" />Day-of-Week Attendance Pattern
                 </h4>
-                <p className="text-slate-500 text-xs mb-4">Which day of the week has highest attendance?</p>
+                <p className="mb-4 text-xs text-slate-500">Which day of the week has highest attendance?</p>
                 <ResponsiveContainer width="100%" height={220}>
                     <RadarChart data={(data.dow_impact || []).filter(d => d.day)}>
                         <PolarGrid stroke="#334155" />
@@ -178,10 +178,10 @@ function GlobalImpact({ data, loading }) {
             {/* Distance to School */}
             {data.distance_impact && data.distance_impact.length > 0 && (
                 <div className="card">
-                    <h4 className="text-white font-medium mb-1 flex items-center gap-2">
+                    <h4 className="flex items-center gap-2 mb-1 font-medium text-white">
                         <MapPin className="w-4 h-4 text-emerald-400" />Distance to School Impact
                     </h4>
-                    <p className="text-slate-500 text-xs mb-4">How far students live affects their attendance rate</p>
+                    <p className="mb-4 text-xs text-slate-500">How far students live affects their attendance rate</p>
                     <ResponsiveContainer width="100%" height={210}>
                         <BarChart data={data.distance_impact}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
@@ -195,7 +195,7 @@ function GlobalImpact({ data, loading }) {
                             </Bar>
                         </BarChart>
                     </ResponsiveContainer>
-                    <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-400 justify-center">
+                    <div className="flex flex-wrap justify-center gap-3 mt-3 text-xs text-slate-400">
                         {DISTANCE_BANDS.map(b => (
                             <span key={b} className="flex items-center gap-1.5">
                                 <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: DISTANCE_COLORS[b] }} />
@@ -270,34 +270,34 @@ function StudentImpact() {
     return (
         <div className="space-y-5">
             {/* Search */}
-            <div className="card space-y-3">
-                <h4 className="text-white font-semibold flex items-center gap-2">
+            <div className="space-y-3 card">
+                <h4 className="flex items-center gap-2 font-semibold text-white">
                     <Search className="w-4 h-4 text-[#272343]" />Student Attendance Lookup
                 </h4>
-                <p className="text-slate-400 text-xs">
+                <p className="text-xs text-slate-400">
                     Enter a student ID (STU0001 – STU0100). Once loaded, <strong className="text-slate-300">click any bar</strong> in the charts below to instantly see the attendance rate for that specific day / weather / event.
                 </p>
                 <div className="flex gap-2">
                     <input type="text" placeholder="e.g. STU0001, STU0051, STU0100"
                         value={inputVal} onChange={e => setInputVal(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                        className="input-field flex-1" />
+                        className="flex-1 input-field" />
                     <button onClick={handleSearch} disabled={loading || !inputVal.trim()}
-                        className="btn-primary px-5 disabled:opacity-40 flex items-center gap-2">
+                        className="flex items-center gap-2 px-5 btn-primary disabled:opacity-40">
                         {loading ? <Loader className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                         {loading ? 'Loading…' : 'Lookup'}
                     </button>
                 </div>
             </div>
 
-            {err && <div className="rounded-xl bg-red-500/10 border border-red-500/30 p-4 text-sm text-red-300">❌ {err}</div>}
-            {loading && <div className="card flex items-center justify-center h-44"><Loader className="w-6 h-6 animate-spin text-[#272343]" /></div>}
+            {err && <div className="p-4 text-sm text-red-300 border rounded-xl bg-red-500/10 border-red-500/30">❌ {err}</div>}
+            {loading && <div className="flex items-center justify-center card h-44"><Loader className="w-6 h-6 animate-spin text-[#272343]" /></div>}
 
             {baseData && !loading && (
                 <div className="space-y-4">
                     {/* Main rate card */}
-                    <div className="card text-center py-7" style={{ border: `1px solid ${rateColor}40`, boxShadow: `0 0 28px ${rateColor}15` }}>
-                        <p className="text-slate-400 text-sm">Attendance Rate — <span className="text-white font-bold">{baseData.student_id}</span></p>
+                    <div className="text-center card py-7" style={{ border: `1px solid ${rateColor}40`, boxShadow: `0 0 28px ${rateColor}15` }}>
+                        <p className="text-sm text-slate-400">Attendance Rate — <span className="font-bold text-white">{baseData.student_id}</span></p>
                         <p className="text-slate-500 text-xs mt-0.5 mb-1 flex items-center justify-center gap-2">
                             📌 {filterLoading ? '⏳ Calculating…' : filterLabel}
                             {activeFilter.type && !filterLoading && (
@@ -305,16 +305,16 @@ function StudentImpact() {
                                     className="text-[#272343] hover:text-white text-xs underline ml-1">[clear]</button>
                             )}
                         </p>
-                        <p className="text-8xl font-black my-3" style={{ color: filterLoading ? '#64748b' : rateColor }}>
+                        <p className="my-3 font-black text-8xl" style={{ color: filterLoading ? '#64748b' : rateColor }}>
                             {filterLoading ? '…' : (rate != null ? `${rate}%` : 'No data')}
                         </p>
-                        <div className="flex justify-center gap-6 text-sm text-slate-400 mb-3">
-                            <span>✅ Present: <span className="text-green-400 font-semibold">{shown?.present ?? '—'}</span></span>
-                            <span>❌ Absent: <span className="text-red-400 font-semibold">{shown?.absent ?? '—'}</span></span>
-                            <span>📊 Total: <span className="text-slate-300 font-semibold">{shown?.total ?? '—'}</span></span>
+                        <div className="flex justify-center gap-6 mb-3 text-sm text-slate-400">
+                            <span>✅ Present: <span className="font-semibold text-green-400">{shown?.present ?? '—'}</span></span>
+                            <span>❌ Absent: <span className="font-semibold text-red-400">{shown?.absent ?? '—'}</span></span>
+                            <span>📊 Total: <span className="font-semibold text-slate-300">{shown?.total ?? '—'}</span></span>
                         </div>
                         <div className="flex flex-wrap justify-center gap-2">
-                            <span className="text-xs bg-slate-700/60 text-slate-300 px-3 py-1 rounded-full">
+                            <span className="px-3 py-1 text-xs rounded-full bg-slate-700/60 text-slate-300">
                                 Overall: <strong className="text-white">{baseData.attendance_rate}%</strong> ({baseData.total} days)
                             </span>
                             {/* Distance badge */}
@@ -325,13 +325,13 @@ function StudentImpact() {
                                     {baseData.distance_km} km — <strong>{baseData.distance_band}</strong>
                                 </span>
                             )}
-                            {dowData.length > 0 && <span className="text-xs bg-green-500/10 text-green-300 px-3 py-1 rounded-full">
+                            {dowData.length > 0 && <span className="px-3 py-1 text-xs text-green-300 rounded-full bg-green-500/10">
                                 Best day: <strong>{[...dowData].sort((a, b) => b.rate - a.rate)[0]?.day}</strong>
                             </span>}
-                            {weatherData.length > 0 && <span className="text-xs bg-cyan-500/10 text-cyan-300 px-3 py-1 rounded-full">
+                            {weatherData.length > 0 && <span className="px-3 py-1 text-xs rounded-full bg-cyan-500/10 text-cyan-300">
                                 Best weather: <strong>{[...weatherData].sort((a, b) => b.rate - a.rate)[0]?.condition}</strong>
                             </span>}
-                            {eventData.length > 0 && <span className="text-xs bg-orange-500/10 text-orange-300 px-3 py-1 rounded-full">
+                            {eventData.length > 0 && <span className="px-3 py-1 text-xs text-orange-300 rounded-full bg-orange-500/10">
                                 Best event: <strong>{[...eventData].sort((a, b) => b.rate - a.rate)[0]?.event}</strong>
                             </span>}
                         </div>
@@ -342,7 +342,7 @@ function StudentImpact() {
                         <div className="card">
                             <h5 className="text-white text-sm font-medium mb-0.5 flex items-center gap-2">
                                 <Activity className="w-3.5 h-3.5 text-green-400" />Attendance by Day of Week
-                                <span className="text-slate-500 text-xs font-normal">— click a bar to filter</span>
+                                <span className="text-xs font-normal text-slate-500">— click a bar to filter</span>
                             </h5>
                             <ResponsiveContainer width="100%" height={180}>
                                 <BarChart data={dowData} style={{ cursor: 'pointer' }}>
@@ -368,7 +368,7 @@ function StudentImpact() {
                         <div className="card">
                             <h5 className="text-white text-sm font-medium mb-0.5 flex items-center gap-2">
                                 <Cloud className="w-3.5 h-3.5 text-cyan-400" />Attendance by Weather Condition
-                                <span className="text-slate-500 text-xs font-normal">— click a bar to filter</span>
+                                <span className="text-xs font-normal text-slate-500">— click a bar to filter</span>
                             </h5>
                             <ResponsiveContainer width="100%" height={160}>
                                 <BarChart data={weatherData} style={{ cursor: 'pointer' }}>
@@ -394,7 +394,7 @@ function StudentImpact() {
                         <div className="card">
                             <h5 className="text-white text-sm font-medium mb-0.5 flex items-center gap-2">
                                 <BookOpen className="w-3.5 h-3.5 text-orange-400" />Attendance by School Event
-                                <span className="text-slate-500 text-xs font-normal">— click a bar to filter</span>
+                                <span className="text-xs font-normal text-slate-500">— click a bar to filter</span>
                             </h5>
                             <ResponsiveContainer width="100%" height={Math.max(220, eventData.length * 26)}>
                                 <BarChart data={eventData} layout="vertical" style={{ cursor: 'pointer' }}>
@@ -421,7 +421,7 @@ function StudentImpact() {
                             <h5 className="text-white text-sm font-medium mb-0.5 flex items-center gap-2">
                                 <TrendingUp className="w-3.5 h-3.5 text-[#272343]" />Monthly Attendance Trend (2023–2025)
                             </h5>
-                            <p className="text-slate-500 text-xs mb-3">Overall attendance rate for every month</p>
+                            <p className="mb-3 text-xs text-slate-500">Overall attendance rate for every month</p>
                             <ResponsiveContainer width="100%" height={160}>
                                 <LineChart data={monthData}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -480,54 +480,54 @@ function PredictionForm() {
                 ))}
             </div> */}
 
-            <div className="card grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 card sm:grid-cols-2 lg:grid-cols-3">
                 {mode === 'student' && (
                     <div className="sm:col-span-2 lg:col-span-3">
-                        <label className="text-xs text-slate-400 mb-1 block">Student ID</label>
+                        <label className="block mb-1 text-xs text-slate-400">Student ID</label>
                         <input type="text" placeholder="e.g. STU0001" value={form.student_id}
-                            onChange={e => update('student_id', e.target.value)} className="input-field w-full" />
+                            onChange={e => update('student_id', e.target.value)} className="w-full input-field" />
                     </div>
                 )}
 
                 <div>
-                    <label className="text-xs text-slate-400 mb-1 block">☁️ Weather</label>
-                    <select value={form.weather} onChange={e => update('weather', e.target.value)} className="input-field w-full">
+                    <label className="block mb-1 text-xs text-slate-400">☁️ Weather</label>
+                    <select value={form.weather} onChange={e => update('weather', e.target.value)} className="w-full input-field">
                         {WEATHER_OPTIONS.map(w => <option key={w}>{w}</option>)}
                     </select>
                 </div>
 
                 <div>
-                    <label className="text-xs text-slate-400 mb-1 block">📅 School Event</label>
-                    <select value={form.school_event} onChange={e => update('school_event', e.target.value)} className="input-field w-full">
+                    <label className="block mb-1 text-xs text-slate-400">📅 School Event</label>
+                    <select value={form.school_event} onChange={e => update('school_event', e.target.value)} className="w-full input-field">
                         {EVENT_OPTIONS.map(e => <option key={e}>{e}</option>)}
                     </select>
                 </div>
 
                 <div>
-                    <label className="text-xs text-slate-400 mb-1 block">🗓️ Day of Week</label>
-                    <select value={form.day_of_week} onChange={e => update('day_of_week', e.target.value)} className="input-field w-full">
+                    <label className="block mb-1 text-xs text-slate-400">🗓️ Day of Week</label>
+                    <select value={form.day_of_week} onChange={e => update('day_of_week', e.target.value)} className="w-full input-field">
                         {DAYS.map((d, i) => <option key={d} value={i}>{d}</option>)}
                     </select>
                 </div>
 
                 <div>
-                    <label className="text-xs text-slate-400 mb-1 block">📆 Month</label>
-                    <select value={form.month} onChange={e => update('month', e.target.value)} className="input-field w-full">
+                    <label className="block mb-1 text-xs text-slate-400">📆 Month</label>
+                    <select value={form.month} onChange={e => update('month', e.target.value)} className="w-full input-field">
                         {MONTHS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
                     </select>
                 </div>
 
                 <div>
-                    <label className="text-xs text-slate-400 mb-1 block">🌡️ Temperature (°C)</label>
+                    <label className="block mb-1 text-xs text-slate-400">🌡️ Temperature (°C)</label>
                     <input type="number" min={-5} max={50} value={form.temperature}
-                        onChange={e => update('temperature', e.target.value)} className="input-field w-full" />
+                        onChange={e => update('temperature', e.target.value)} className="w-full input-field" />
                 </div>
 
                 {/* Distance Slider */}
                 <div>
-                    <label className="text-xs text-slate-400 mb-1 block flex items-center gap-1">
+                    <label className="flex items-center block gap-1 mb-1 text-xs text-slate-400">
                         <MapPin className="w-3 h-3 text-emerald-400" />
-                        Distance to School: <span className="text-white font-semibold ml-1">{form.distance_km} km</span>
+                        Distance to School: <span className="ml-1 font-semibold text-white">{form.distance_km} km</span>
                         <span className="ml-1 px-1.5 py-0.5 rounded text-[10px] font-medium"
                             style={{ background: `${DISTANCE_COLORS[form.distance_km < 6.75 ? 'Nearby' : form.distance_km < 13 ? 'Moderate' : form.distance_km < 19.25 ? 'Far' : 'Very Far']}25`, color: DISTANCE_COLORS[form.distance_km < 6.75 ? 'Nearby' : form.distance_km < 13 ? 'Moderate' : form.distance_km < 19.25 ? 'Far' : 'Very Far'] }}>
                             {form.distance_km < 6.75 ? 'Nearby' : form.distance_km < 13 ? 'Moderate' : form.distance_km < 19.25 ? 'Far' : 'Very Far'}
@@ -543,14 +543,14 @@ function PredictionForm() {
                 </div>
 
                 <div className="flex items-end">
-                    <label className="flex items-center gap-3 cursor-pointer group w-full">
+                    <label className="flex items-center w-full gap-3 cursor-pointer group">
                         <input type="checkbox" checked={form.is_holiday} onChange={e => update('is_holiday', e.target.checked)}
                             className="w-4 h-4 rounded accent-[#272343]" />
-                        <span className="text-sm text-slate-300 group-hover:text-white transition-colors">Academic Holiday</span>
+                        <span className="text-sm transition-colors text-slate-300 group-hover:text-white">Academic Holiday</span>
                     </label>
                 </div>
 
-                <div className="sm:col-span-2 lg:col-span-3 flex justify-end">
+                <div className="flex justify-end sm:col-span-2 lg:col-span-3">
                     <button onClick={handlePredict} disabled={loading}
                         className="btn-primary px-8 disabled:opacity-50 text-base py-2.5">
                         {loading ? <Loader className="w-4 h-4 animate-spin" /> : <Brain className="w-4 h-4" />}
@@ -559,28 +559,28 @@ function PredictionForm() {
                 </div>
             </div>
 
-            {err && <div className="rounded-xl bg-red-500/10 border border-red-500/30 p-4 text-sm text-red-300">{err}</div>}
+            {err && <div className="p-4 text-sm text-red-300 border rounded-xl bg-red-500/10 border-red-500/30">{err}</div>}
 
             {result && !loading && (
                 <div className="space-y-5">
-                    <div className="card text-center py-8 glow-navy" style={{ border: `1px solid ${rateColor}40` }}>
-                        <p className="text-slate-400 text-sm mb-2">{mode === 'global' ? 'Predicted School-Wide Attendance' : `Predicted Attendance for ${result.student_id || form.student_id}`}</p>
-                        <p className="text-7xl font-black mb-2" style={{ color: rateColor }}>{rate?.toFixed(1)}%</p>
+                    <div className="py-8 text-center card glow-navy" style={{ border: `1px solid ${rateColor}40` }}>
+                        <p className="mb-2 text-sm text-slate-400">{mode === 'global' ? 'Predicted School-Wide Attendance' : `Predicted Attendance for ${result.student_id || form.student_id}`}</p>
+                        <p className="mb-2 font-black text-7xl" style={{ color: rateColor }}>{rate?.toFixed(1)}%</p>
                         {result.historical_rate && (
-                            <p className="text-slate-500 text-sm flex items-center justify-center gap-2">
-                                Historical average: <span className="text-slate-300 font-medium">{result.historical_rate}%</span>
+                            <p className="flex items-center justify-center gap-2 text-sm text-slate-500">
+                                Historical average: <span className="font-medium text-slate-300">{result.historical_rate}%</span>
                                 {rate > result.historical_rate
                                     ? <TrendingUp className="w-4 h-4 text-green-400" />
                                     : <TrendingDown className="w-4 h-4 text-red-400" />}
                             </p>
                         )}
-                        {result.fallback && <p className="text-amber-400 text-xs mt-2">⚠ Statistical fallback used (limited student data)</p>}
+                        {result.fallback && <p className="mt-2 text-xs text-amber-400">⚠ Statistical fallback used (limited student data)</p>}
                     </div>
 
                     {mode === 'global' && result.weather_comparison && result.event_comparison && (
-                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                        <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
                             <div className="card">
-                                <h5 className="text-white text-sm font-medium mb-3 flex items-center gap-2">
+                                <h5 className="flex items-center gap-2 mb-3 text-sm font-medium text-white">
                                     <Cloud className="w-3.5 h-3.5 text-cyan-400" />Predicted Rate by Weather
                                 </h5>
                                 <ResponsiveContainer width="100%" height={180}>
@@ -596,7 +596,7 @@ function PredictionForm() {
                                 </ResponsiveContainer>
                             </div>
                             <div className="card">
-                                <h5 className="text-white text-sm font-medium mb-3 flex items-center gap-2">
+                                <h5 className="flex items-center gap-2 mb-3 text-sm font-medium text-white">
                                     <BookOpen className="w-3.5 h-3.5 text-orange-400" />Predicted Rate by Event
                                 </h5>
                                 <ResponsiveContainer width="100%" height={180}>
@@ -617,7 +617,7 @@ function PredictionForm() {
                     {/* Distance Comparison — global mode */}
                     {mode === 'global' && result.distance_comparison && (
                         <div className="card">
-                            <h5 className="text-white text-sm font-medium mb-3 flex items-center gap-2">
+                            <h5 className="flex items-center gap-2 mb-3 text-sm font-medium text-white">
                                 <MapPin className="w-3.5 h-3.5 text-emerald-400" />Predicted Rate by Distance Band
                             </h5>
                             <ResponsiveContainer width="100%" height={160}>
@@ -635,9 +635,9 @@ function PredictionForm() {
                     )}
 
                     {mode === 'student' && result.weather_scan && (
-                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                        <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
                             <div className="card">
-                                <h5 className="text-white text-sm font-medium mb-3 flex items-center gap-2">
+                                <h5 className="flex items-center gap-2 mb-3 text-sm font-medium text-white">
                                     <Cloud className="w-3.5 h-3.5 text-cyan-400" />Weather Impact for this Student
                                 </h5>
                                 <ResponsiveContainer width="100%" height={180}>
@@ -653,7 +653,7 @@ function PredictionForm() {
                                 </ResponsiveContainer>
                             </div>
                             <div className="card">
-                                <h5 className="text-white text-sm font-medium mb-3 flex items-center gap-2">
+                                <h5 className="flex items-center gap-2 mb-3 text-sm font-medium text-white">
                                     <BookOpen className="w-3.5 h-3.5 text-orange-400" />Event Impact for this Student
                                 </h5>
                                 <ResponsiveContainer width="100%" height={180}>
@@ -674,7 +674,7 @@ function PredictionForm() {
                     {/* Distance Comparison — student mode */}
                     {mode === 'student' && result.distance_scan && (
                         <div className="card">
-                            <h5 className="text-white text-sm font-medium mb-3 flex items-center gap-2">
+                            <h5 className="flex items-center gap-2 mb-3 text-sm font-medium text-white">
                                 <MapPin className="w-3.5 h-3.5 text-emerald-400" />Distance Impact for this Student
                                 {result.distance_band && (
                                     <span className="ml-auto text-xs px-2 py-0.5 rounded-full"
@@ -699,14 +699,14 @@ function PredictionForm() {
 
                     {result.holiday_comparison && (
                         <div className="card">
-                            <h5 className="text-white text-sm font-medium mb-3 flex items-center gap-2">
+                            <h5 className="flex items-center gap-2 mb-3 text-sm font-medium text-white">
                                 <Calendar className="w-3.5 h-3.5 text-purple-400" />Holiday Effect
                             </h5>
                             <div className="grid grid-cols-3 gap-4 text-center">
                                 <RateGauge value={result.holiday_comparison.without_holiday} label="Normal School Day" sub="Predicted" />
                                 <RateGauge value={result.holiday_comparison.with_holiday} label="Academic Holiday" sub="Predicted" />
-                                <div className="stat-card text-center">
-                                    <p className="text-slate-400 text-xs mb-2">Impact of Holiday</p>
+                                <div className="text-center stat-card">
+                                    <p className="mb-2 text-xs text-slate-400">Impact of Holiday</p>
                                     <p className={`text-4xl font-black ${result.holiday_comparison.holiday_impact < 0 ? 'text-red-400' : 'text-green-400'}`}>
                                         {result.holiday_comparison.holiday_impact > 0 ? '+' : ''}{result.holiday_comparison.holiday_impact?.toFixed(1)}%
                                     </p>
@@ -717,18 +717,18 @@ function PredictionForm() {
 
                     {result.feature_importance && (
                         <div className="card">
-                            <h5 className="text-white text-sm font-medium mb-3 flex items-center gap-2">
+                            <h5 className="flex items-center gap-2 mb-3 text-sm font-medium text-white">
                                 <Zap className="w-3.5 h-3.5 text-yellow-400" />Top Factors Driving Attendance
                             </h5>
                             <div className="space-y-2">
                                 {result.feature_importance.map((f, i) => (
                                     <div key={i} className="flex items-center gap-3">
-                                        <span className="text-slate-400 text-xs w-36 truncate flex-shrink-0">{f.feature.replace('weather_', '').replace('event_', '')}</span>
-                                        <div className="flex-1 bg-slate-700 rounded-full h-2">
+                                        <span className="flex-shrink-0 text-xs truncate text-slate-400 w-36">{f.feature.replace('weather_', '').replace('event_', '')}</span>
+                                        <div className="flex-1 h-2 rounded-full bg-slate-700">
                                             <div className="h-2 rounded-full bg-gradient-to-r from-[#272343] to-purple-500 transition-all"
                                                 style={{ width: `${(f.importance / result.feature_importance[0].importance) * 100}%` }} />
                                         </div>
-                                        <span className="text-slate-300 text-xs w-14 text-right font-mono">{(f.importance * 100).toFixed(2)}%</span>
+                                        <span className="font-mono text-xs text-right text-slate-300 w-14">{(f.importance * 100).toFixed(2)}%</span>
                                     </div>
                                 ))}
                             </div>
@@ -807,12 +807,12 @@ function GuestTrendAnalyzer({ onClose }) {
     ] : [];
 
     return (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 backdrop-blur-sm overflow-y-auto py-6 px-4" onClick={e => e.target === e.currentTarget && onClose()}>
-            <div className="w-full max-w-4xl bg-slate-900 rounded-2xl border border-slate-700 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-start justify-center px-4 py-6 overflow-y-auto bg-black/70 backdrop-blur-sm" onClick={e => e.target === e.currentTarget && onClose()}>
+            <div className="w-full max-w-4xl border shadow-2xl bg-slate-900 rounded-2xl border-slate-700">
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700 sticky top-0 bg-slate-900 z-10 rounded-t-2xl">
+                <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-slate-700 bg-slate-900 rounded-t-2xl">
                     <div>
-                        <h2 className="text-white font-bold text-lg flex items-center gap-2">
+                        <h2 className="flex items-center gap-2 text-lg font-bold text-white">
                             <Sparkles className="w-5 h-5 text-purple-400" />
                             Guest Trend Analyzer
                         </h2>
@@ -820,7 +820,7 @@ function GuestTrendAnalyzer({ onClose }) {
                     </div>
                     <div className="flex items-center gap-3">
                         {step === 2 && <button onClick={() => setStep(1)} className="text-xs text-[#272343] hover:text-white px-3 py-1.5 rounded-lg bg-slate-800 transition">← Edit Inputs</button>}
-                        <button onClick={onClose} className="p-2 rounded-xl hover:bg-slate-700 transition text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
+                        <button onClick={onClose} className="p-2 transition rounded-xl hover:bg-slate-700 text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
                     </div>
                 </div>
 
@@ -836,15 +836,15 @@ function GuestTrendAnalyzer({ onClose }) {
                             </div>
 
                             {/* Section 1: Attendance Grid */}
-                            <div className="card space-y-3">
+                            <div className="space-y-3 card">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-white font-semibold flex items-center gap-2"><Activity className="w-4 h-4 text-[#272343]" />Last 30 Days Attendance</h3>
+                                    <h3 className="flex items-center gap-2 font-semibold text-black"><Activity className="w-4 h-4 text-[#272343]" />Last 30 Days Attendance</h3>
                                     <div className="flex gap-2">
                                         <button onClick={() => fillAll(1)} className="text-xs px-3 py-1 rounded-lg bg-[#E3F6F5] text-emerald-400 hover:bg-emerald-500/20 transition">All Present</button>
-                                        <button onClick={() => fillAll(0)} className="text-xs px-3 py-1 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition">All Absent</button>
+                                        <button onClick={() => fillAll(0)} className="px-3 py-1 text-xs text-red-400 transition rounded-lg bg-red-500/10 hover:bg-red-500/20">All Absent</button>
                                     </div>
                                 </div>
-                                <p className="text-slate-400 text-xs">Click each day to toggle between <span className="text-emerald-400 font-medium">Present ✅</span> and <span className="text-red-400 font-medium">Absent ❌</span></p>
+                                <p className="text-xs text-slate-400">Click each day to toggle between <span className="font-medium text-emerald-400">Present ✅</span> and <span className="font-medium text-red-400">Absent ❌</span></p>
                                 <div className="grid gap-1.5" style={{ gridTemplateColumns: 'repeat(10,1fr)' }}>
                                     {attendance.map((v, i) => (
                                         <button key={i} onClick={() => toggleDay(i)}
@@ -854,7 +854,7 @@ function GuestTrendAnalyzer({ onClose }) {
                                                 }`}>{i + 1}</button>
                                     ))}
                                 </div>
-                                <div className="flex gap-4 text-sm pt-1">
+                                <div className="flex gap-4 pt-1 text-sm">
                                     <span className="text-slate-400">Present: <strong className="text-emerald-400">{presentCount}</strong></span>
                                     <span className="text-slate-400">Absent: <strong className="text-red-400">{absentCount}</strong></span>
                                     <span className="text-slate-400">Rate: <strong className="text-white">{histRate}%</strong></span>
@@ -862,24 +862,24 @@ function GuestTrendAnalyzer({ onClose }) {
                             </div>
 
                             {/* Section 2: Contextual Settings */}
-                            <div className="card space-y-4">
-                                <h3 className="text-white font-semibold flex items-center gap-2"><Cloud className="w-4 h-4 text-cyan-400" />Your Context</h3>
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            <div className="space-y-4 card">
+                                <h3 className="flex items-center gap-2 font-semibold text-black"><Cloud className="w-4 h-4 text-cyan-400" />Your Context</h3>
+                                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                                     <div>
-                                        <label className="text-xs text-slate-400 mb-1 block">☁️ Typical Weather</label>
-                                        <select value={weather} onChange={e => setWeather(e.target.value)} className="input-field w-full">
+                                        <label className="block mb-1 text-xs text-slate-400">☁️ Typical Weather</label>
+                                        <select value={weather} onChange={e => setWeather(e.target.value)} className="w-full input-field">
                                             {WEATHER_OPTS.map(w => <option key={w}>{w}</option>)}
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="text-xs text-slate-400 mb-1 block">🌡️ Temperature (°C)</label>
+                                        <label className="block mb-1 text-xs text-slate-400">🌡️ Temperature (°C)</label>
                                         <input type="number" min={0} max={50} value={temperature}
-                                            onChange={e => setTemp(e.target.value)} className="input-field w-full" />
+                                            onChange={e => setTemp(e.target.value)} className="w-full input-field" />
                                     </div>
                                     <div className="col-span-2">
-                                        <label className="text-xs text-slate-400 mb-1 flex items-center gap-1">
+                                        <label className="flex items-center gap-1 mb-1 text-xs text-slate-400">
                                             <MapPin className="w-3 h-3 text-emerald-400" />
-                                            Distance to School: <span className="text-white font-semibold ml-1">{distKm} km</span>
+                                            Distance to School: <span className="ml-1 font-semibold text-white">{distKm} km</span>
                                             <span className="ml-1 px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ background: `${distColor}20`, color: distColor }}>{distBand}</span>
                                         </label>
                                         <input type="range" min={0.5} max={25} step={0.5} value={distKm}
@@ -889,7 +889,7 @@ function GuestTrendAnalyzer({ onClose }) {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="text-xs text-slate-400 mb-2 block">📅 Forecast Horizon</label>
+                                    <label className="block mb-2 text-xs text-slate-400">📅 Forecast Horizon</label>
                                     <div className="flex gap-2">
                                         {[7, 10, 14].map(h => (
                                             <button key={h} onClick={() => setHorizon(h)}
@@ -901,33 +901,33 @@ function GuestTrendAnalyzer({ onClose }) {
                             </div>
 
                             {/* Section 3: Upcoming Schedule */}
-                            <div className="card space-y-3">
+                            <div className="space-y-3 card">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-white font-semibold flex items-center gap-2"><Calendar className="w-4 h-4 text-purple-400" />Upcoming Schedule <span className="text-slate-500 text-xs font-normal">(optional)</span></h3>
+                                    <h3 className="flex items-center gap-2 font-semibold text-black"><Calendar className="w-4 h-4 text-purple-400" />Upcoming Schedule <span className="text-xs font-normal text-slate-500">(optional)</span></h3>
                                     <button onClick={addEvent} className="text-xs px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 transition">+ Add Day</button>
                                 </div>
                                 {upcomingEvts.length === 0
-                                    ? <p className="text-slate-500 text-xs italic">No upcoming days added. Add specific dates with events or holidays to improve prediction accuracy.</p>
+                                    ? <p className="text-xs italic text-slate-500">No upcoming days added. Add specific dates with events or holidays to improve prediction accuracy.</p>
                                     : <div className="space-y-2">{upcomingEvts.map((ev, i) => (
-                                        <div key={i} className="flex items-center gap-2 bg-slate-800/50 rounded-xl p-2">
-                                            <input type="date" value={ev.date} onChange={e => updateEvt(i, 'date', e.target.value)} className="input-field text-xs py-1 w-36" />
-                                            <select value={ev.event} onChange={e => updateEvt(i, 'event', e.target.value)} className="input-field text-xs py-1 flex-1">
+                                        <div key={i} className="flex items-center gap-2 p-2 bg-slate-800/50 rounded-xl">
+                                            <input type="date" value={ev.date} onChange={e => updateEvt(i, 'date', e.target.value)} className="py-1 text-xs input-field w-36" />
+                                            <select value={ev.event} onChange={e => updateEvt(i, 'event', e.target.value)} className="flex-1 py-1 text-xs input-field">
                                                 {EVENT_OPTS.map(o => <option key={o}>{o}</option>)}
                                             </select>
                                             <label className="flex items-center gap-1.5 text-xs text-slate-400 cursor-pointer whitespace-nowrap">
                                                 <input type="checkbox" checked={ev.is_holiday} onChange={e => updateEvt(i, 'is_holiday', e.target.checked)} className="accent-[#272343]" />
                                                 Holiday
                                             </label>
-                                            <button onClick={() => removeEvt(i)} className="p-1 text-slate-500 hover:text-red-400 transition"><X className="w-3.5 h-3.5" /></button>
+                                            <button onClick={() => removeEvt(i)} className="p-1 transition text-slate-500 hover:text-red-400"><X className="w-3.5 h-3.5" /></button>
                                         </div>
                                     ))}</div>
                                 }
                             </div>
 
-                            {err && <div className="rounded-xl bg-red-500/10 border border-red-500/30 p-3 text-sm text-red-300">{err}</div>}
+                            {err && <div className="p-3 text-sm text-red-300 border rounded-xl bg-red-500/10 border-red-500/30">{err}</div>}
 
                             <button onClick={handleAnalyze} disabled={loading}
-                                className="w-full btn-primary py-3 text-base font-semibold disabled:opacity-50 flex items-center justify-center gap-2">
+                                className="flex items-center justify-center w-full gap-2 py-3 text-base font-semibold btn-primary disabled:opacity-50">
                                 {loading ? <Loader className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
                                 {loading ? 'Running ARIMA + Context Analysis…' : 'Analyze My Attendance Trend'}
                             </button>
@@ -942,9 +942,9 @@ function GuestTrendAnalyzer({ onClose }) {
                                     { label: 'Forecast Days', value: `${horizon} days`, color: '#8b5cf6', icon: <Calendar className="w-4 h-4" /> },
                                     { label: 'Total Context Δ', value: `${result.factor_summary?.total_contextual_delta > 0 ? '+' : ''}${result.factor_summary?.total_contextual_delta}%`, color: (result.factor_summary?.total_contextual_delta || 0) >= 0 ? '#22c55e' : '#ef4444', icon: <Zap className="w-4 h-4" /> },
                                 ].map((c, i) => (
-                                    <div key={i} className="card text-center py-4" style={{ borderColor: `${c.color}30` }}>
+                                    <div key={i} className="py-4 text-center card" style={{ borderColor: `${c.color}30` }}>
                                         <div className="flex justify-center mb-1" style={{ color: c.color }}>{c.icon}</div>
-                                        <p className="text-xs text-slate-400 mb-1">{c.label}</p>
+                                        <p className="mb-1 text-xs text-slate-400">{c.label}</p>
                                         <p className="text-lg font-black" style={{ color: c.color }}>{c.value}</p>
                                     </div>
                                 ))}
@@ -952,10 +952,10 @@ function GuestTrendAnalyzer({ onClose }) {
 
                             {/* Combined chart */}
                             <div className="card">
-                                <h4 className="text-white font-medium mb-1 flex items-center gap-2">
+                                <h4 className="flex items-center gap-2 mb-1 font-medium text-white">
                                     <BarChart2 className="w-4 h-4 text-[#272343]" />Attendance Timeline
                                 </h4>
-                                <p className="text-slate-500 text-xs mb-4">
+                                <p className="mb-4 text-xs text-slate-500">
                                     <span className="inline-block w-3 h-0.5 bg-[#272343] mr-1 align-middle"></span>Historical weekly rate &nbsp;
                                     <span className="inline-block w-3 h-0.5 bg-purple-400 mr-1 align-middle" style={{ borderTop: '2px dashed #a78bfa' }}></span>ARIMA forecast &nbsp;
                                     <span className="inline-block w-3 h-2 align-middle rounded" style={{ background: 'rgba(139,92,246,0.15)' }}></span> Confidence band
@@ -978,12 +978,12 @@ function GuestTrendAnalyzer({ onClose }) {
 
                             {/* Context-Aware Explanation Cards — THE RESEARCH NOVELTY */}
                             <div className="space-y-3">
-                                <h4 className="text-white font-semibold flex items-center gap-2">
+                                <h4 className="flex items-center gap-2 font-semibold text-white">
                                     <Brain className="w-4 h-4 text-purple-400" />
                                     Context-Aware Insights
                                     <span className="ml-2 text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full border border-purple-500/30 font-medium">Research Novelty</span>
                                 </h4>
-                                <p className="text-slate-500 text-xs">AI explanations tied to Sri Lankan school life — holiday impact, weather risk, and distance factors analysed per forecast week</p>
+                                <p className="text-xs text-slate-500">AI explanations tied to Sri Lankan school life — holiday impact, weather risk, and distance factors analysed per forecast week</p>
                                 {(result.context_explanations || []).map((ex, i) => {
                                     const sty = SEV_STYLES[ex.severity_color] || SEV_STYLES.yellow;
                                     return (
@@ -994,7 +994,7 @@ function GuestTrendAnalyzer({ onClose }) {
                                                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${sty.badge}`}>
                                                             {ex.severity_emoji} Week {ex.week} — {ex.severity}
                                                         </span>
-                                                        <span className="text-slate-500 text-xs">{ex.period}</span>
+                                                        <span className="text-xs text-slate-500">{ex.period}</span>
                                                     </div>
                                                     <p className={`font-semibold text-sm ${sty.text}`}>{ex.headline}</p>
                                                 </div>
@@ -1008,7 +1008,7 @@ function GuestTrendAnalyzer({ onClose }) {
                                             {ex.details?.length > 0 && (
                                                 <ul className="space-y-1">
                                                     {ex.details.map((d, di) => (
-                                                        <li key={di} className="text-xs text-slate-300 flex items-start gap-2">
+                                                        <li key={di} className="flex items-start gap-2 text-xs text-slate-300">
                                                             <span className="text-slate-500 mt-0.5 shrink-0">›</span>{d}
                                                         </li>
                                                     ))}
@@ -1025,12 +1025,12 @@ function GuestTrendAnalyzer({ onClose }) {
                                                         const fColor = f.delta > 0 ? '#22c55e' : '#ef4444';
                                                         return (
                                                             <div key={fi} className="flex items-center gap-2">
-                                                                <span className="text-xs w-4">{f.icon}</span>
-                                                                <span className="text-xs text-slate-400 w-40 truncate shrink-0">{f.name}</span>
+                                                                <span className="w-4 text-xs">{f.icon}</span>
+                                                                <span className="w-40 text-xs truncate text-slate-400 shrink-0">{f.name}</span>
                                                                 <div className="flex-1 bg-slate-700 rounded-full h-1.5">
                                                                     <div className="h-1.5 rounded-full transition-all" style={{ width: `${pct}%`, background: fColor }} />
                                                                 </div>
-                                                                <span className="text-xs font-mono w-10 text-right" style={{ color: fColor }}>{f.delta > 0 ? '+' : ''}{f.delta}%</span>
+                                                                <span className="w-10 font-mono text-xs text-right" style={{ color: fColor }}>{f.delta > 0 ? '+' : ''}{f.delta}%</span>
                                                             </div>
                                                         );
                                                     })}
@@ -1041,27 +1041,8 @@ function GuestTrendAnalyzer({ onClose }) {
                                 })}
                             </div>
 
-                            {/* Factor summary */}
-                            {result.factor_summary && (
-                                <div className="card">
-                                    <h4 className="text-white font-medium mb-3 flex items-center gap-2"><Zap className="w-4 h-4 text-yellow-400" />Overall Context Factors</h4>
-                                    <div className="grid grid-cols-3 gap-3">
-                                        {[result.factor_summary.weather, result.factor_summary.temperature, result.factor_summary.distance].map((f, i) => (
-                                            <div key={i} className="bg-slate-800/60 rounded-xl p-3 text-center">
-                                                <p className="text-xs text-slate-500 mb-1">{['Weather', 'Temperature', 'Distance'][i]}</p>
-                                                <p className="text-white text-sm font-bold">{f?.name || f?.label || f?.band}</p>
-                                                <p className={`text-lg font-black mt-1 ${(f?.delta || 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                                                    {(f?.delta || 0) > 0 ? '+' : ''}{f?.delta || 0}%
-                                                </p>
-                                                <p className="text-slate-500 text-[10px] mt-1 line-clamp-2">{f?.description}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
                             {!result.converged && (
-                                <div className="rounded-xl bg-amber-500/10 border border-amber-500/30 p-3 text-xs text-amber-300 flex items-center gap-2">
+                                <div className="flex items-center gap-2 p-3 text-xs border rounded-xl bg-amber-500/10 border-amber-500/30 text-amber-300">
                                     <Info className="w-4 h-4 shrink-0" />
                                     ARIMA convergence fallback used — linear trend extrapolation applied. Results may be less precise with limited data.
                                 </div>
@@ -1102,12 +1083,12 @@ export default function ContextualAnalysis() {
         <div className="space-y-6">
             <div>
                 <h1 className="text-2xl font-bold gradient-text">Contextual Impact Analysis</h1>
-                <p className="text-slate-400 text-sm mt-1">
+                <p className="mt-1 text-sm text-slate-400">
                     How weather, academic holidays, and school events affect student attendance — with ML predictions
                 </p>
             </div>
 
-            <div className="card py-4 flex items-center gap-4">
+            <div className="flex items-center gap-4 py-4 card">
                 <div className="flex gap-3">
                     {[{ icon: Cloud, c: 'text-cyan-400', l: 'Weather' }, { icon: Calendar, c: 'text-purple-400', l: 'Holidays' },
                     { icon: BookOpen, c: 'text-orange-400', l: 'Events' }, { icon: MapPin, c: 'text-emerald-400', l: 'Distance' },
@@ -1136,10 +1117,10 @@ export default function ContextualAnalysis() {
 
             {tab === 'global' && (
                 impactErr
-                    ? <div className="rounded-xl bg-red-500/10 border border-red-500/30 p-6 text-center text-red-300 text-sm">
-                        <AlertTriangle className="w-7 h-7 mx-auto mb-2 text-red-400" />
+                    ? <div className="p-6 text-sm text-center text-red-300 border rounded-xl bg-red-500/10 border-red-500/30">
+                        <AlertTriangle className="mx-auto mb-2 text-red-400 w-7 h-7" />
                         {impactErr}
-                        <p className="text-slate-500 text-xs mt-2">Start the ML service: <code className="text-[#272343]">python ml_service/app.py</code></p>
+                        <p className="mt-2 text-xs text-slate-500">Start the ML service: <code className="text-[#272343]">python ml_service/app.py</code></p>
                     </div>
                     : <GlobalImpact data={impact} loading={impactLoading} />
             )}
@@ -1147,20 +1128,20 @@ export default function ContextualAnalysis() {
             {tab === 'predict' && (
                 <div className="space-y-4">
                     {/* Guest Trend Analyzer CTA */}
-                    <div className="rounded-2xl border border-purple-500/30 bg-gradient-to-r from-purple-500/10 via-slate-800/40 to-blue-500/10 p-5 flex items-center justify-between gap-4">
+                    <div className="flex items-center justify-between gap-4 p-5 border rounded-2xl border-purple-500/30 bg-gradient-to-r from-purple-500/10 via-slate-800/40 to-blue-500/10">
                         <div>
                             <div className="flex items-center gap-2 mb-1">
                                 <Sparkles className="w-4 h-4 text-purple-400" />
                                 <span className="text-[#272343] font-semibold text-sm">Guest Trend Analyzer</span>
                                 <span className="text-[10px] bg-purple-500/20 text-purple-600 px-2 py-0.5 rounded-full border border-purple-500/30">NEW</span>
                             </div>
-                            <p className="text-slate-500 text-xs leading-relaxed">
+                            <p className="text-xs leading-relaxed text-slate-500">
                                 New student? Enter your last 30 days of attendance and get an ARIMA-powered forecast with <strong className="text-purple-600">context-aware explanations</strong> tied to Sri Lankan school life — holidays, weather, distance & events.
                             </p>
                         </div>
                         <button onClick={() => setShowGuestAnalyzer(true)}
                             className="shrink-0 px-5 py-2.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white transition-all shadow-lg shadow-purple-500/20 flex items-center gap-2">
-                            <Sparkles className="w-4 h-4" /> Try It Free
+                            <Sparkles className="w-4 h-4" /> Analyze My Trend
                         </button>
                     </div>
                     <PredictionForm />
