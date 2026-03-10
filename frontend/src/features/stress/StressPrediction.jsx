@@ -6,7 +6,7 @@ import HistoryModal, { fmtDate } from "../../components/HistoryModal";
 import { getUser } from "../../services/authService";
 import { Activity, Brain, BarChart2, Zap, TrendingUp, BookOpen } from "lucide-react";
 
-/* ── helpers ─────────────────────────────────────────── */
+
 // Uses model's actual prediction string: "Good" | "Bad" | "Awful"
 function stressColor(pred) {
   if (!pred) return { bg: "bg-slate-100", text: "text-slate-500", hex: "#94a3b8", ring: "ring-slate-200" };
@@ -115,15 +115,15 @@ function RecommendationCard({ index, description }) {
 function StressPrediction() {
   const [formData, setFormData] = useState({
     studentName: "Student",
-    term_mark_avg: "50",
-    prev_term_mark_avg: "50",
-    daily_study: "2",
+    term_mark_avg: "0",
+    prev_term_mark_avg: "0",
+    daily_study: "0",
     prefer_study: "1",
     travel_time: "0",
     financial_status: "0",
-    social_media: "1",
-    sleep_hours: "7",
-    attendance: "80",
+    social_media: "0",
+    sleep_hours: "0",
+    attendance: "0",
     tuition_hours_per_week: "0",
     disaster_impact: "0",
   });

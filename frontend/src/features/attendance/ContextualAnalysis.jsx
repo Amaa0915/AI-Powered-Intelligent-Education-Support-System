@@ -753,15 +753,13 @@ const SEV_STYLES = {
 function GuestTrendAnalyzer({ onClose }) {
     const DAYS = 30;
     const [attendance, setAttendance] = useState(() => {
-        // Default: realistic ~80% attendance pattern (24 present, 6 absent spread out)
-        const a = Array(DAYS).fill(1);
-        [4, 9, 14, 19, 24, 29].forEach(i => { a[i] = 0; });
-        return a;
+        // Start with all days present (1) - user can mark absent days
+        return Array(DAYS).fill(1);
     });
     const [weather, setWeather] = useState('sunny');
     const [temperature, setTemp] = useState(28);
-    const [distKm, setDistKm] = useState(5);
-    const [horizon, setHorizon] = useState(14);
+    const [distKm, setDistKm] = useState(0.5);
+    const [horizon, setHorizon] = useState(7);
     const [upcomingEvts, setUpEvts] = useState([]);
     const [step, setStep] = useState(1); // 1=form, 2=results
     const [loading, setLoading] = useState(false);
