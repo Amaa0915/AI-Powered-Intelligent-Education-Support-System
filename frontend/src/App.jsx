@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useSearchParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // Auth pages
@@ -9,6 +9,7 @@ import RegisterPage from './pages/auth/RegisterPage';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import { isAuthenticated, isAdmin } from './services/authService';
 
 // Learning Path features
 import LPAddStudent from './features/learning-path/AddStudent';
@@ -53,8 +54,16 @@ function App() {
       <Router>
         <Routes>
           {/* ── Public routes ───────────────────────────────────────── */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={
+            isAuthenticated()
+              ? <Navigate to={isAdmin() ? '/admin/dashboard' : '/add-student'} replace />
+              : <HomePage />
+          } />
+          <Route path="/login" element={
+            isAuthenticated()
+              ? <Navigate to={isAdmin() ? '/admin/dashboard' : '/add-student'} replace />
+              : <LoginPage />
+          } />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
 

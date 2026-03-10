@@ -19,7 +19,7 @@ export default function LoginPage() {
 
     const redirect = (role) => {
         if (from && from !== '/login' && from !== '/register') return navigate(from, { replace: true });
-        navigate(role === 'admin' ? '/admin/dashboard' : '/dashboard', { replace: true });
+        navigate(role === 'admin' ? '/admin/dashboard' : '/add-student', { replace: true });
     };
 
     const handleSubmit = async (e) => {

@@ -448,7 +448,9 @@ End with: Safety Disclaimer: [one sentence]"""
                 recs.append(line.split('.', 1)[1].strip())
         return recs[:5] if len(recs) >= 3 else ["AI response parsing error. Please retry."]
     except Exception as e:
-        print(f"Gemini error: {e}")
+        print(f"❌ Gemini error: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
         if any(k in str(e) for k in ["429", "RESOURCE_EXHAUSTED", "quota"]):
             return ["Gemini API daily quota exhausted. Stress prediction still works above.",
                     "Quota resets at midnight Pacific Time.",
