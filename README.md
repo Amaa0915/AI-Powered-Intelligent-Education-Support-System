@@ -11,7 +11,7 @@ An intelligent, full-stack web application that leverages **Machine Learning** a
 
 ---
 
-## 📋 Table of Contents
+## 📋 Table of Contents 
 
 - [Overview](#overview)
 - [Key Features](#key-features)
